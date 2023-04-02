@@ -1,0 +1,16 @@
+[workspace]
+default-members = [
+  "backend/server",
+  "backend/crypto",
+  "backend/query",
+  "frontend",
+  "shared/cookie",
+]
+members = [
+  "backend/server",
+  "backend/crypto",
+  "backend/query",
+  "frontend",
+  "shared/cookie",
+  "tools/project-init",
+]

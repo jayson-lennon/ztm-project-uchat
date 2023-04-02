@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.0.2" use-changelog="false" last-position="526,467" last-zoom="1.1" max-obj-count="19"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<database name="uchat" is-template="false" allow-conns="true">
+</database>
+
+<schema name="public" layers="0" fill-color="#c2cdff" sql-disabled="true">
+</schema>
+
+<table name="posts" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="public"/>
+	<position x="440" y="1080"/>
+	<column name="id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="content" not-null="true">
+		<type name="jsonb" length="0"/>
+	</column>
+	<column name="time_posted" not-null="true">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[when time is in the future, the post is scheduled for that time]]> </comment>
+	</column>
+	<column name="direct_message_to">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="reply_to">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<constraint name="posts_pk" type="pk-constr" table="public.posts">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="poll_choices" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<position x="1100" y="1440"/>
+	<column name="id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="choice" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="post_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<constraint name="poll_choices_pk" type="pk-constr" table="public.poll_choices">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="poll_votes" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="public"/>
+	<position x="1760" y="1300"/>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="post_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="choice_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<constraint name="poll_votes_pk" type="pk-constr" table="public.poll_votes">
+		<columns names="user_id,post_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="reactions" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="public"/>
+	<position x="560" y="600"/>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="post_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<column name="like_status" not-null="true">
+		<type name="smallint" length="0"/>
+	</column>
+	<column name="reaction">
+		<type name="jsonb" length="0"/>
+	</column>
+	<constraint name="reactions_pk" type="pk-constr" table="public.reactions">
+		<columns names="user_id,post_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="bookmarks" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<position x="1120" y="980"/>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="post_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<constraint name="bookmarks_pk" type="pk-constr" table="public.bookmarks">
+		<columns names="user_id,post_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="users" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="public"/>
+	<position x="1480" y="460"/>
+	<column name="id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="email">
+		<type name="text" length="0"/>
+	</column>
+	<column name="email_confirmed">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<column name="password_hash" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="display_name">
+		<type name="text" length="0"/>
+	</column>
+	<column name="handle" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<column name="profile_image">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="email_is_unique" type="uq-constr" table="public.users">
+		<columns names="email" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="users_pk" type="pk-constr" table="public.users">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="handle_is_unique" type="uq-constr" table="public.users">
+		<columns names="handle" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<textbox name="post info" layers="0" z-value="0" font-size="9">
+	<position x="120" y="1140"/>
+	<comment> <![CDATA[Scheduling posts for a future date sets the
+`time_posted` time in the future.]]> </comment>
+</textbox>
+
+<textbox name="content-info" layers="0" z-value="0" font-size="9">
+	<position x="0" y="1060"/>
+	<comment> <![CDATA[`content`:
+"boost": contains posts.id
+"poll": contains poll_options.id (in order) and a description of poll
+others: no database issues]]> </comment>
+</textbox>
+
+<table name="web" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="public"/>
+	<position x="940" y="380"/>
+	<column name="id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="expires_at" not-null="true">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<column name="fingerprint" not-null="true">
+		<type name="jsonb" length="0"/>
+	</column>
+	<constraint name="web_pk" type="pk-constr" table="public.web">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="one_session_per_device" type="uq-constr" table="public.web">
+		<columns names="user_id,fingerprint" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<textbox name="dm" layers="0" z-value="0" font-size="9">
+	<position x="60" y="1200"/>
+	<comment> <![CDATA[If `direct_message` contains a user id, then
+this post must be 'chat' or 'image' and
+it will only be visible to `user_id` and `direct_message`]]> </comment>
+</textbox>
+
+<textbox name="post-comment" layers="0" z-value="0" font-size="9">
+	<position x="100" y="1280"/>
+	<comment> <![CDATA[if `comment` contains a `post.id`, then
+it will get listed as a comment under the post]]> </comment>
+</textbox>
+
+<table name="followers" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<position x="1880" y="840"/>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="follows" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="CURRENT_TIMESTAMP">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<constraint name="followers_pk" type="pk-constr" table="public.followers">
+		<columns names="user_id,follows" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="post_pagination_index" table="public.posts"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="user_id"/>
+		</idxelement>
+		<idxelement use-sorting="false">
+			<column name="time_posted"/>
+		</idxelement>
+	<columns names="id,user_id"/>
+</index>
+
+<table name="boosts" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<position x="1420" y="1120"/>
+	<column name="post_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="user_id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="boosted_at" not-null="true">
+		<type name="timestamptz" length="0"/>
+	</column>
+	<constraint name="boosts_pk" type="pk-constr" table="public.boosts">
+		<columns names="post_id,user_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.posts">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="direct_message_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.posts">
+	<columns names="direct_message_to" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="comment_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.posts" table="public.posts">
+	<columns names="reply_to" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="post_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.posts" table="public.poll_choices">
+	<columns names="post_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="post_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.posts" table="public.poll_votes">
+	<columns names="post_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.poll_votes">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="choice_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.poll_choices" table="public.poll_votes">
+	<columns names="choice_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="post_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.posts" table="public.reactions">
+	<columns names="post_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.reactions">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="post_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.posts" table="public.bookmarks">
+	<columns names="post_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.bookmarks">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.web">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.followers">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="follows_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.followers">
+	<columns names="follows" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="post_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.posts" table="public.boosts">
+	<columns names="post_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user_id_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.users" table="public.boosts">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="post has many poll votes" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.poll_votes"
+	 dst-table="public.posts" reference-fk="post_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="3.54106" y="-35.7475"/>
+	</label>
+</relationship>
+
+<relationship name="poll options belong to posts" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.poll_choices"
+	 dst-table="public.posts" reference-fk="post_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="38.6111" y="-21.5989"/>
+	</label>
+</relationship>
+
+<relationship name="posts have many reactions" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.reactions"
+	 dst-table="public.posts" reference-fk="post_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="bookmarks belong to posts" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.bookmarks"
+	 dst-table="public.posts" reference-fk="post_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="28.0411" y="-26.244"/>
+	</label>
+</relationship>
+
+<relationship name="posts belong to users'" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.posts"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="74.5411" y="-49.7366"/>
+	</label>
+</relationship>
+
+<relationship name="votes belong to users" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.poll_votes"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="bookmarks belong to users" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.bookmarks"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="-12.931" y="-28.353"/>
+	</label>
+</relationship>
+
+<relationship name="reactions belong to users" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.reactions"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="-216.436" y="-36.0488"/>
+	</label>
+</relationship>
+
+<relationship name="poll votes have a single option" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.poll_votes"
+	 dst-table="public.poll_choices" reference-fk="choice_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="src-label">
+		<position x="-409.296" y="155.585"/>
+	</label>
+	<label ref-type="name-label">
+		<position x="-2.02144" y="-21.2557"/>
+	</label>
+</relationship>
+
+<relationship name="web sessions belong to users" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.web"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="5.89279" y="-45.1434"/>
+	</label>
+</relationship>
+
+<relationship name="users have many direct messages" type="relfk" layers="0"
+	 custom-color="#ff5500"
+	 src-table="public.posts"
+	 dst-table="public.users" reference-fk="direct_message_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="-26.9197" y="-62.7777"/>
+	</label>
+</relationship>
+
+<relationship name="posts can have many comments" type="relfk" layers="0"
+	 custom-color="#00ff7f"
+	 src-table="public.posts"
+	 dst-table="public.posts" reference-fk="comment_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="779.327" y="1188.71"/>
+	<position x="779.327" y="1047"/>
+	<position x="644.218" y="1047"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="0.377606" y="33.3"/>
+	</label>
+</relationship>
+
+<relationship name="users can follow many others" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.followers"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="-111.142" y="8.88833"/>
+	</label>
+</relationship>
+
+<relationship name="users have many followers" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.followers"
+	 dst-table="public.users" reference-fk="follows_user_id"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="90.8697" y="-49.0777"/>
+	</label>
+</relationship>
+
+<relationship name="boosts have one post" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.boosts"
+	 dst-table="public.posts" reference-fk="post_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="70.5411" y="-31.5792"/>
+	</label>
+</relationship>
+
+<relationship name="boosts belong to users" type="relfk" layers="0"
+	 custom-color="#00d4ff"
+	 src-table="public.boosts"
+	 dst-table="public.users" reference-fk="user_id_fk"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+</dbmodel>

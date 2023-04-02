@@ -1,0 +1,62 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cfg-if = "1"
+chrono = { version = "0.4.24", features = ["serde"] }
+console_log = { version = "1.0", optional = true, features = ["color"] }
+dioxus = { version = "0.3.2", default-features = false, features = [
+  "dioxus-core-macro",
+  "dioxus-hooks",
+  "dioxus-html",
+  "dioxus-rsx",
+  "hooks",
+  "html",
+  "macro",
+] }
+dioxus-router = { version = "0.3.0", features = ["web"] }
+dioxus-web = "0.3.1"
+fermi = "0.3.0"
+futures = "0.3.27"
+gloo-file = { version = "0.2.3", features = ["futures"] }
+gloo-timers = { version = "0.2.6", features = ["futures"] }
+gloo-utils = "0.1.6"
+indexmap = "1.9.3"
+itertools = "0.10.5"
+js-sys = "0.3.61"
+load-dotenv = "0.1.2"
+log = "0.4"
+once_cell = "1.17.1"
+reqwest = { git = "https://github.com/seanmonstar/reqwest", features = [
+  "json",
+  "serde_json",
+] }
+serde = { version = "1.0.159", features = ["derive"] }
+serde_json = "1.0.95"
+thiserror = "1.0.40"
+url = "2.3.1"
+web-sys = { version = "0.3.61", features = [
+  "Blob",
+  "Document",
+  "File",
+  "FileList",
+  "History",
+  "HtmlDocument",
+  "HtmlInputElement",
+  "Location",
+  "Window",
+] }
+wasm-bindgen = "0.2.84"
+
+# needed to build docs (bug in interprocess crate transitive dependency)
+interprocess = { version = "1.2.1", features = ["tokio"], optional = true }
+
+uchat_cookie = { path = "../shared/cookie" }
+
+[features]
+default = ["console_log"]
+docbuild = ["interprocess"]

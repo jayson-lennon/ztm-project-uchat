@@ -1,0 +1,17 @@
+[package]
+name = "uchat_crypto"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+argon2 = "0.5.0"
+base64 = "0.21.0"
+password-hash = { version = "0.5.0", features = ["std"] }
+rand = "0.8.5"
+rand_core = { version = "0.6.4", features = ["std"] }
+rmp-serde = "1.1.1"
+rsa = { version = "0.8.2", features = ["sha2", "serde"] }
+thiserror = "1.0.38"
+tracing = { version = "0.1.37", features = ["attributes"] }

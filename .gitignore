@@ -1,0 +1,54 @@
+# project-specific
+usercontent/
+private_key.base64
+
+# Private
+*.env
+*.env.development.local
+*.env.test.local
+*.env.production.local
+*.env.local
+**/.DS_Store
+**/Thumbs.db
+*.pem
+*.key
+*.p12
+*.pfx
+*.pub
+*.ssh
+*.cer
+*.crt
+*.der
+**/.gnupg
+
+# generated
+*.tags
+*.log
+*.out
+*.err
+*.bak
+*.tmp
+*.swp
+*.pdb
+
+# IDE
+**/.vscode
+**/.idea
+**/.gradle
+*.iml
+*.ipr
+*.iws
+
+# web
+frontend/node_modules/
+frontend/*.tsbuildinfo
+frontend/.npm/
+**/dist/
+**/*.pid
+**/*.pid.lock
+
+# Rust
+**/debug/
+**/target/
+**/*.rs.bk
+
