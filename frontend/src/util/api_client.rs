@@ -41,6 +41,7 @@ impl ApiClient {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 async fn post_json<T>(
     client: ApiClient,
     endpoint: &str,
@@ -56,7 +57,6 @@ where
         client
             .inner
             .post(url)
-            // .header("credentials", "include")
             .fetch_credentials_include()
             .json(json)
             .send()
@@ -65,8 +65,24 @@ where
     make_request(api_request, timeout).await
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+async fn post_json<T>(
+    client: ApiClient,
+    endpoint: &str,
+    json: &T,
+    timeout: std::time::Duration,
+) -> Result<reqwest::Response, RequestError>
+where
+    T: Serialize + ?Sized,
+{
+    let url = make_absolute_url(endpoint);
+
+    let api_request = async { client.inner.post(url).json(json).send().await };
+    make_request(api_request, timeout).await
+}
+
 fn make_absolute_url(endpoint: &str) -> reqwest::Url {
-    let url = reqwest::Url::parse(uchat_api::ROOT_API_URL).unwrap();
+    let url = reqwest::Url::parse(crate::ROOT_API_URL).unwrap();
     url.join(endpoint).unwrap()
 }
 
