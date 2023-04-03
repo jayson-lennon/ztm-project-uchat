@@ -1,4 +1,6 @@
+pub mod api_client;
 pub mod cookie;
+pub use api_client::ApiClient;
 
 use serde::Deserialize;
 use wasm_bindgen::JsCast;
