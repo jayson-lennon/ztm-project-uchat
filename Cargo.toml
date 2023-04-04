@@ -5,6 +5,7 @@ default-members = [
   "backend/query",
   "frontend",
   "shared/cookie",
+  "shared/domain",
 ]
 members = [
   "backend/server",
@@ -12,5 +13,6 @@ members = [
   "backend/query",
   "frontend",
   "shared/cookie",
+  "shared/domain",
   "tools/project-init",
 ]
