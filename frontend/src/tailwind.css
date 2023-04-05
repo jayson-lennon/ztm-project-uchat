@@ -12,4 +12,8 @@
   .input-field {
     @apply w-full border-2 rounded border-slate-400;
   }
+
+  .fieldset {
+    @apply p-3 border-2 border-solid border-slate-300;
+  }
 }
