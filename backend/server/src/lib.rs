@@ -2,6 +2,7 @@ use axum::extract::FromRef;
 use uchat_query::{AsyncConnection, AsyncConnectionPool, QueryError};
 
 pub mod logging;
+pub mod router;
 
 #[derive(FromRef, Clone)]
 pub struct AppState {

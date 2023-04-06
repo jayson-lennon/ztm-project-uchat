@@ -78,7 +78,7 @@ async fn run() -> Result<()> {
 
     info!(target: "uchat_server", bind_addr = %args.bind);
 
-    let router = uchat_server::new_router(state);
+    let router = uchat_server::router::new_router(state);
 
     let server = axum::Server::try_bind(&args.bind)
         .wrap_err_with(|| "server initialization error")
