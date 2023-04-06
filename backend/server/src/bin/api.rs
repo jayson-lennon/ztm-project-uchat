@@ -31,6 +31,8 @@ enum Command {
 }
 
 async fn run() -> Result<()> {
+    color_eyre::install()?;
+
     let use_dotenv = dotenvy::dotenv();
 
     let args = Cli::parse();
