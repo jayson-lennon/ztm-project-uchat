@@ -16,4 +16,8 @@
   .fieldset {
     @apply p-3 border-2 border-solid border-slate-300;
   }
+
+  .btn-disabled {
+    @apply bg-slate-300 cursor-not-allowed;
+  }
 }
