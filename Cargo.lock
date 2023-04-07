@@ -3276,6 +3276,7 @@ dependencies = [
  "tracing-subscriber",
  "uchat_cookie",
  "uchat_crypto",
+ "uchat_endpoint",
  "uchat_query",
  "url",
  "uuid",

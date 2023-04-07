@@ -39,4 +39,5 @@ uuid = { version = "1.3.0", features = ["v4", "serde"] }
 
 uchat_cookie = { path = "../../shared/cookie" }
 uchat_crypto = { path = "../crypto" }
+uchat_endpoint = { path = "../../shared/endpoint" }
 uchat_query = { path = "../query" }
