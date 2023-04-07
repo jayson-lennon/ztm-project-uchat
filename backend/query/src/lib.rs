@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate diesel_derive_newtype;
+pub mod schema;
 
 #[cfg(test)]
 pub mod test_db;
