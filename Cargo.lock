@@ -3216,6 +3216,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "uchat_endpoint"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "load-dotenv",
+ "serde",
+ "thiserror",
+ "uchat_domain",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "uchat_query"
 version = "0.1.0"
 dependencies = [
