@@ -11,6 +11,7 @@ pub fn App(cx: Scope) -> Element {
     cx.render(rsx! {
         Router {
             Route { to: page::ACCOUNT_REGISTER, page::Register {} },
+            Route { to: page::ACCOUNT_LOGIN, page::Login {} },
         }
     })
 }

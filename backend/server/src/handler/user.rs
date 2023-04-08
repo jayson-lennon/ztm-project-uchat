@@ -29,3 +29,15 @@ impl PublicApiRequest for CreateUser {
         ))
     }
 }
+
+#[async_trait]
+impl PublicApiRequest for Login {
+    type Response = (StatusCode, Json<LoginOk>);
+    async fn process_request(
+        self,
+        DbConnection(mut conn): DbConnection,
+        state: AppState,
+    ) -> ApiResult<Self::Response> {
+        todo!();
+    }
+}
