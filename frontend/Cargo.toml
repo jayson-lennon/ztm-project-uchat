@@ -57,6 +57,7 @@ interprocess = { version = "1.2.1", features = ["tokio"], optional = true }
 
 uchat_cookie = { path = "../shared/cookie" }
 uchat_domain = { path = "../shared/domain" }
+uchat_endpoint = { path = "../shared/endpoint" }
 
 [features]
 default = ["console_log"]

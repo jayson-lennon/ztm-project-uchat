@@ -1119,6 +1119,7 @@ dependencies = [
  "thiserror",
  "uchat_cookie",
  "uchat_domain",
+ "uchat_endpoint",
  "url",
  "wasm-bindgen",
  "web-sys",

@@ -113,18 +113,16 @@ async fn make_request(
 #[macro_export]
 macro_rules! fetch_json {
     (<$target:ty>, $client:ident, $request:expr) => {{
-        use uchat_api::Endpoint;
+        use uchat_endpoint::Endpoint;
         use $crate::util::RequestError;
         let duration = std::time::Duration::from_millis(6000);
-        let response = $client
-            .post_json($request.self_url(), &$request, duration)
-            .await;
+        let response = $client.post_json($request.url(), &$request, duration).await;
         match response {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(res.json::<$target>().await.unwrap())
                 } else {
-                    let err_payload = res.json::<uchat_api::RequestFailed>().await.unwrap();
+                    let err_payload = res.json::<uchat_endpoint::RequestFailed>().await.unwrap();
                     Err(RequestError::BadRequest(err_payload))
                 }
             }
