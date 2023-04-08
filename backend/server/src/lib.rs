@@ -3,6 +3,7 @@ use uchat_query::{AsyncConnection, AsyncConnectionPool, QueryError};
 
 pub mod error;
 pub mod extractor;
+pub mod handler;
 pub mod logging;
 pub mod router;
 

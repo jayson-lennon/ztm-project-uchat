@@ -1,4 +1,8 @@
-use axum::{http::HeaderValue, routing::get, Router};
+use axum::{
+    http::HeaderValue,
+    routing::{get, post},
+    Router,
+};
 use hyper::{header::CONTENT_TYPE, Method};
 use tower::ServiceBuilder;
 use tower_http::{
@@ -8,11 +12,14 @@ use tower_http::{
     LatencyUnit,
 };
 use tracing::Level;
+use uchat_endpoint::{user::endpoint::CreateUser, Endpoint};
 
-use crate::AppState;
+use crate::{handler::with_public_handler, AppState};
 
 pub fn new_router(state: AppState) -> axum::Router {
-    let public_routes = Router::new().route("/", get(move || async { "this is the root page" }));
+    let public_routes = Router::new()
+        .route("/", get(move || async { "this is the root page" }))
+        .route(CreateUser::URL, post(with_public_handler::<CreateUser>));
     let authorized_routes = Router::new();
 
     Router::new()
