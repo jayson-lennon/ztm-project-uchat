@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
+use uchat_domain::UserFacingError;
 
 use crate::{
     elements::{keyed_notification_box::KeyedNotifications, KeyedNotificationBox},
@@ -110,7 +111,7 @@ pub fn Register(cx: Scope) -> Element {
 
     let username_oninput = sync_handler!([page_state], move |ev: FormEvent| {
         if let Err(e) = uchat_domain::Username::new(&ev.value) {
-            page_state.with_mut(|state| state.form_errors.set("bad-username", e.to_string()));
+            page_state.with_mut(|state| state.form_errors.set("bad-username", e.formatted_error()));
         } else {
             page_state.with_mut(|state| state.form_errors.remove("bad-username"));
         }
@@ -119,7 +120,7 @@ pub fn Register(cx: Scope) -> Element {
 
     let password_oninput = sync_handler!([page_state], move |ev: FormEvent| {
         if let Err(e) = uchat_domain::Password::new(&ev.value) {
-            page_state.with_mut(|state| state.form_errors.set("bad-password", e.to_string()));
+            page_state.with_mut(|state| state.form_errors.set("bad-password", e.formatted_error()));
         } else {
             page_state.with_mut(|state| state.form_errors.remove("bad-password"));
         }
