@@ -3,6 +3,8 @@ use serde::Deserialize;
 
 use crate::{error::ApiResult, extractor::DbConnection, AppState};
 
+pub mod user;
+
 #[async_trait]
 pub trait PublicApiRequest {
     type Response: IntoResponse;
