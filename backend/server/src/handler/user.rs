@@ -48,5 +48,38 @@ impl PublicApiRequest for Login {
         uchat_crypto::verify_password(self.password, &hash)?;
 
         let user = uchat_query::user::find(&mut conn, &self.username)?;
+
+        // new session
+        let (session, signature, duration) = {
+            let fingerprint = serde_json::json!({});
+            let session_duration = Duration::weeks(3);
+            let session = uchat_query::session::new(
+                &mut conn,
+                user.id,
+                session_duration,
+                fingerprint.into(),
+            )?;
+
+            let mut rng = state.rng.clone();
+            let signature = state
+                .signing_keys
+                .sign(&mut rng, session.id.as_uuid().as_bytes());
+
+            let signature = uchat_crypto::encode_base64(signature);
+            (session, signature, session_duration)
+        };
+
+        Ok((
+            StatusCode::OK,
+            Json(LoginOk {
+                session_id: session.id,
+                session_expires: Utc::now() + duration,
+                session_signature: signature,
+                display_name: user.display_name,
+                email: user.email,
+                profile_image: None,
+                user_id: user.id,
+            }),
+        ))
     }
 }
