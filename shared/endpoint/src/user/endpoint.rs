@@ -19,6 +19,10 @@ impl Endpoint for CreateUser {
 pub struct CreateUserOk {
     pub user_id: UserId,
     pub username: Username,
+
+    pub session_signature: String,
+    pub session_id: SessionId,
+    pub session_expires: DateTime<Utc>,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
