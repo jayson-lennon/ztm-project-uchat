@@ -1,7 +1,8 @@
 use axum::{async_trait, Json};
+use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use tracing::info;
-use uchat_endpoint::user::endpoint::{CreateUser, CreateUserOk};
+use uchat_endpoint::user::endpoint::{CreateUser, CreateUserOk, Login, LoginOk};
 
 use crate::{error::ApiResult, extractor::DbConnection, AppState};
 
@@ -38,6 +39,14 @@ impl PublicApiRequest for Login {
         DbConnection(mut conn): DbConnection,
         state: AppState,
     ) -> ApiResult<Self::Response> {
-        todo!();
+        let _span = tracing::span!(tracing::Level::INFO, "logging in",
+                user = %self.username.as_ref())
+        .entered();
+        let hash = uchat_query::user::get_password_hash(&mut conn, &self.username)?;
+        let hash = uchat_crypto::password::deserialize_hash(&hash)?;
+
+        uchat_crypto::verify_password(self.password, &hash)?;
+
+        let user = uchat_query::user::find(&mut conn, &self.username)?;
     }
 }
