@@ -62,4 +62,5 @@ pub enum IdError {
 }
 
 new_id!(UserId);
+new_id!(PostId);
 new_id!(SessionId);
