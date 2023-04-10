@@ -11,10 +11,6 @@ pub struct NewPost {
     pub options: NewPostOptions,
 }
 
-impl Endpoint for NewPost {
-    const URL: &'static str = "/post/new";
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct NewPostOk {
     pub post_id: PostId,

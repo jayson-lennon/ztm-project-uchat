@@ -10,8 +10,23 @@ pub trait Endpoint {
     }
 }
 
+macro_rules! route {
+    ($url:literal => $request_type:ty) => {
+        impl Endpoint for $request_type {
+            const URL: &'static str = $url;
+        }
+    };
+}
+
 #[derive(thiserror::Error, Debug, Deserialize, Serialize)]
 #[error("{msg}")]
 pub struct RequestFailed {
     pub msg: String,
 }
+
+// public routes
+route!("/account/create" => user::endpoint::CreateUser);
+route!("/account/login" => user::endpoint::Login);
+
+// authorized routes
+route!("/post/new" => post::endpoint::NewPost);
