@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+pub mod post;
 pub mod user;
 
 pub trait Endpoint {
