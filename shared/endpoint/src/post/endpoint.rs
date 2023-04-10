@@ -1,12 +1,18 @@
 use serde::{Deserialize, Serialize};
 use uchat_domain::ids::PostId;
 
+use crate::Endpoint;
+
 use super::types::{Content, NewPostOptions};
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct NewPost {
     pub content: Content,
     pub options: NewPostOptions,
+}
+
+impl Endpoint for NewPost {
+    const URL: &'static str = "/post/new";
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]

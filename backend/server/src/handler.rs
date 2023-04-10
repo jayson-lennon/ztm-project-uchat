@@ -7,6 +7,7 @@ use crate::{
     AppState,
 };
 
+pub mod post;
 pub mod user;
 
 #[async_trait]
