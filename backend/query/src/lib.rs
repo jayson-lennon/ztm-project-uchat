@@ -13,5 +13,6 @@ pub use error::QueryError;
 pub mod util;
 pub use util::{AsyncConnection, AsyncConnectionPool, OwnedAsyncConnection};
 
+pub mod post;
 pub mod session;
 pub mod user;
