@@ -104,13 +104,10 @@ pub fn ToastRoot<'a>(cx: Scope<'a, ToastRootProps<'a>>) -> Element {
 
     let total_toasts = &toaster.read().toasts.len();
 
-    let _remove_expired = use_future(cx, (total_toasts,), |(total_toasts,)| {
+    let _remove_expired = use_future(cx, (total_toasts,), |_| {
         let toaster = toaster.clone();
         async move {
-            loop {
-                if total_toasts == 0 {
-                    break;
-                }
+            while !toaster.read().toasts.is_empty() {
                 let expired_ids = toaster
                     .read()
                     .iter()

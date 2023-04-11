@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 use crate::{fetch_json, prelude::*};
+use chrono::Duration;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -102,10 +103,13 @@ pub fn HeadlineInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
 pub fn NewChat(cx: Scope) -> Element {
     let api_client = ApiClient::global();
     let router = use_router(cx);
+    let toaster = use_toaster(cx);
     let page_state = use_ref(cx, PageState::default);
 
-    let form_onsubmit =
-        async_handler!(&cx, [api_client, page_state, router], move |_| async move {
+    let form_onsubmit = async_handler!(
+        &cx,
+        [api_client, page_state, toaster, router],
+        move |_| async move {
             use uchat_domain::post::{Headline, Message};
             use uchat_endpoint::post::endpoint::{NewPost, NewPostOk};
             use uchat_endpoint::post::types::{Chat, NewPostOptions};
@@ -128,11 +132,17 @@ pub fn NewChat(cx: Scope) -> Element {
             let response = fetch_json!(<NewPostOk>, api_client, request);
             match response {
                 Ok(_) => {
+                    toaster.write().success("Posted!", Duration::seconds(3));
                     router.replace_route(page::HOME, None, None);
                 }
-                Err(e) => (),
+                Err(e) => {
+                    toaster
+                        .write()
+                        .error(format!("Post failed: {e}"), Duration::seconds(3));
+                }
             }
-        });
+        }
+    );
 
     let submit_btn_style = maybe_class!("btn-disabled", !page_state.read().can_submit());
 
