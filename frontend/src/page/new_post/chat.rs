@@ -139,7 +139,7 @@ pub fn NewChat(cx: Scope) -> Element {
     cx.render(rsx! {
         form {
             class: "flex flex-col gap-4",
-            onsubmit: move |_| (),
+            onsubmit: form_onsubmit,
             prevent_default: "onsubmit",
             MessageInput { page_state: page_state.clone() },
             HeadlineInput { page_state: page_state.clone() },
