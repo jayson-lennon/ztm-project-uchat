@@ -28,3 +28,19 @@ impl UserFacingError for PasswordError {
         }
     }
 }
+
+#[nutype(validate(max_len = 30))]
+#[derive(AsRef, Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct DisplayName(String);
+
+impl DisplayName {
+    pub const MAX_CHARS: usize = 30;
+}
+
+impl UserFacingError for DisplayNameError {
+    fn formatted_error(&self) -> &'static str {
+        match self {
+            DisplayNameError::TooLong => "Display name is too long. Must be at most 30 characters.",
+        }
+    }
+}
