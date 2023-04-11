@@ -14,6 +14,7 @@ pub fn App(cx: Scope) -> Element {
             Route { to: page::ACCOUNT_REGISTER, page::Register {} },
             Route { to: page::ACCOUNT_LOGIN, page::Login {} },
             Route { to: page::HOME, page::Home {} },
+            Route { to: page::POST_NEW_CHAT, page::NewChat {} },
             Navbar {}
         }
     })
