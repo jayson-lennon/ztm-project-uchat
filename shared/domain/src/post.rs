@@ -19,6 +19,10 @@ impl UserFacingError for HeadlineError {
 #[derive(AsRef, Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Message(String);
 
+impl Message {
+    pub const MAX_CHARS: usize = 100;
+}
+
 impl UserFacingError for MessageError {
     fn formatted_error(&self) -> &'static str {
         match self {
