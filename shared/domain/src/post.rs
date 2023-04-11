@@ -6,6 +6,10 @@ use crate::UserFacingError;
 #[derive(AsRef, Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Headline(String);
 
+impl Headline {
+    pub const MAX_CHARS: usize = 30;
+}
+
 impl UserFacingError for HeadlineError {
     fn formatted_error(&self) -> &'static str {
         match self {
