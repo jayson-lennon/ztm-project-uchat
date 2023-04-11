@@ -80,5 +80,37 @@ pub struct ToastRootProps<'a> {
 }
 
 pub fn ToastRoot<'a>(cx: Scope<'a, ToastRootProps<'a>>) -> Element {
-    todo!()
+    let toaster = cx.props.toaster;
+
+    let toasts = &toaster.read();
+
+    let ToastElements = toasts.iter().map(|(&id, toast)| {
+        let toast_style = match toast.kind {
+            ToastKind::Info => "bg-slate-200 border-slate-300",
+            ToastKind::Error => "bg-rose-300 border-rose-400",
+            ToastKind::Success => "bg-emerald-200 border-emerald-300",
+        };
+        rsx! {
+            div {
+                key: "{id}",
+                class: "{toast_style} p-3 cursor-pointer border-solid border rounded",
+                onclick: move |_| {
+                    toaster.write().remove(id);
+                },
+                "{toast.message}"
+            }
+        }
+    });
+
+    cx.render(rsx! {
+        div {
+            class: "fixed bottom-[var(--navbar-height)]
+                    w-screen
+                    max-w-[var(--content-max-width)]",
+            div {
+                class: "flex flex-col gap-5 px-5 mb-5",
+                ToastElements,
+            }
+        }
+    })
 }
