@@ -1,11 +1,13 @@
 #![allow(non_snake_case)]
 
-use crate::prelude::*;
+use crate::{elements::post::content::Content, prelude::*};
 use dioxus::prelude::*;
 use fermi::{use_atom_ref, UseAtomRef};
 use indexmap::IndexMap;
 use uchat_domain::ids::PostId;
 use uchat_endpoint::post::types::PublicPost;
+
+pub mod content;
 
 pub fn use_post_manager(cx: &ScopeState) -> &UseAtomRef<PostManager> {
     use_atom_ref(cx, crate::app::POSTMANAGER)
@@ -52,6 +54,7 @@ impl PostManager {
     }
 }
 
+#[inline_props]
 pub fn PublicPostEntry(cx: Scope, post_id: PostId) -> Element {
     let post_manager = use_post_manager(cx);
     let router = use_router(cx);
@@ -63,13 +66,14 @@ pub fn PublicPostEntry(cx: Scope, post_id: PostId) -> Element {
 
     cx.render(rsx! {
         div {
+            key: "{this_post.id.to_string()}",
             class: "grid grid-cols-[50px_1fr] gap-2 mb-4",
             div { /* profile image */},
             div {
                 class: "flex flex-col gap-3",
                 // header
                 // reply to
-                // content
+                Content { post: this_post },
                 // action bar
                 hr {},
             }

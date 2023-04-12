@@ -25,7 +25,6 @@ impl ApiClient {
     where
         T: Serialize + ?Sized,
     {
-        log::warn!("client: post_json");
         post_json(self.clone(), endpoint, json, timeout).await
     }
 
@@ -54,7 +53,6 @@ where
 {
     let url = make_absolute_url(endpoint);
 
-    log::warn!("external: post_json");
     let api_request = async {
         client
             .inner
@@ -64,7 +62,6 @@ where
             .send()
             .await
     };
-    log::warn!("making request...");
     make_request(api_request, timeout).await
 }
 
@@ -81,7 +78,6 @@ where
     let url = make_absolute_url(endpoint);
 
     let api_request = async { client.inner.post(url).json(json).send().await };
-    log::warn!("making req");
     make_request(api_request, timeout).await
 }
 
@@ -102,16 +98,13 @@ async fn make_request(
     pin_mut!(api_request);
 
     let timeout_ms = timeout.as_millis() as u32;
-    log::warn!("about to select request...");
     match select(api_request, TimeoutFuture::new(timeout_ms)).await {
         Either::Left((response, b)) => {
             drop(b);
-            log::warn!("riht dropped");
             response.map_err(RequestError::Request)
         }
         Either::Right((_, request)) => {
             drop(request);
-            log::warn!("left dropped");
             Err(RequestError::Timeout)
         }
     }
@@ -127,10 +120,8 @@ macro_rules! fetch_json {
         match response {
             Ok(res) => {
                 if res.status().is_success() {
-                    log::warn!("getgot");
                     Ok(res.json::<$target>().await.unwrap())
                 } else {
-                    log::warn!("err payload");
                     let err_payload = res.json::<uchat_endpoint::RequestFailed>().await.unwrap();
                     Err(RequestError::BadRequest(err_payload))
                 }
