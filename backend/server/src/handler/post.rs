@@ -2,11 +2,11 @@ use axum::{async_trait, Json};
 use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use tracing::info;
-use uchat_domain::ids::*;
+use uchat_domain::{ids::*, Username};
 use uchat_endpoint::{
     post::{
         endpoint::{NewPost, NewPostOk, TrendingPosts, TrendingPostsOk},
-        types::PublicPost,
+        types::{LikeStatus, PublicPost},
     },
     user::endpoint::{CreateUser, CreateUserOk, Login, LoginOk},
     RequestFailed,
@@ -30,19 +30,35 @@ pub fn to_public(
     use uchat_query::user as query_user;
 
     if let Ok(mut content) = serde_json::from_value(post.content.0) {
-        PublicPost {
-            id: (),
-            by_user: (),
-            content: (),
-            time_posted: (),
-            reply_to: (),
-            like_status: (),
-            bookmarked: (),
-            boosted: (),
-            likes: (),
-            dislikes: (),
-            boosts: (),
-        }
+        Ok(PublicPost {
+            id: post.id,
+            by_user: {
+                let profile = query_user::get(conn, post.user_id)?;
+                super::user::to_public(profile)?
+            },
+            content,
+            time_posted: post.time_posted,
+            reply_to: {
+                match post.reply_to {
+                    Some(other_post_id) => {
+                        let original_post = query_post::get(conn, other_post_id)?;
+                        let original_user = query_user::get(conn, original_post.user_id)?;
+                        Some((
+                            Username::new(original_user.handle).unwrap(),
+                            original_user.id,
+                            other_post_id,
+                        ))
+                    }
+                    None => None,
+                }
+            },
+            like_status: LikeStatus::NoReaction,
+            bookmarked: false,
+            boosted: false,
+            likes: 0,
+            dislikes: 0,
+            boosts: 0,
+        })
     } else {
         Err(ApiError {
             code: Some(StatusCode::INTERNAL_SERVER_ERROR),
