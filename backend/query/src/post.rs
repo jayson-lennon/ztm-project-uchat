@@ -54,3 +54,18 @@ pub fn new(conn: &mut PgConnection, post: Post) -> Result<PostId, DieselError> {
         Ok(post.id)
     })
 }
+
+pub fn get(conn: &mut PgConnection, post_id: PostId) -> Result<Post, DieselError> {
+    use crate::schema::posts::dsl::*;
+    posts.filter(id.eq(post_id.as_uuid())).get_result(conn)
+}
+
+pub fn get_trending(conn: &mut PgConnection) -> Result<Vec<Post>, DieselError> {
+    use crate::schema::posts;
+    posts::table
+        .filter(posts::time_posted.lt(Utc::now()))
+        .filter(posts::direct_message_to.is_null())
+        .order(posts::time_posted.desc())
+        .limit(30)
+        .get_results(conn)
+}

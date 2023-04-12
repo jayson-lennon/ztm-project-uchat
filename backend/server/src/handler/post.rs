@@ -95,5 +95,20 @@ impl AuthorizedApiRequest for TrendingPosts {
         session: UserSession,
         state: AppState,
     ) -> ApiResult<Self::Response> {
+        use uchat_query::post as query_post;
+
+        let mut posts = vec![];
+
+        for post in query_post::get_trending(&mut conn)? {
+            let post_id = post.id;
+            match to_public(&mut conn, post, Some(&session)) {
+                Ok(post) => posts.push(post),
+                Err(e) => {
+                    tracing::error!(err = %e.err, post_id = ?post_id, "post contains invalid data");
+                }
+            }
+        }
+
+        Ok((StatusCode::OK, Json(TrendingPostsOk { posts })))
     }
 }
