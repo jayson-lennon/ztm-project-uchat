@@ -51,3 +51,28 @@ impl PostManager {
         self.posts.remove(post_id);
     }
 }
+
+pub fn PublicPostEntry(cx: Scope, post_id: PostId) -> Element {
+    let post_manager = use_post_manager(cx);
+    let router = use_router(cx);
+
+    let this_post = {
+        let post = post_manager.read().get(&post_id).unwrap().clone();
+        use_state(cx, || post)
+    };
+
+    cx.render(rsx! {
+        div {
+            class: "grid grid-cols-[50px_1fr] gap-2 mb-4",
+            div { /* profile image */},
+            div {
+                class: "flex flex-col gap-3",
+                // header
+                // reply to
+                // content
+                // action bar
+                hr {},
+            }
+        }
+    })
+}
