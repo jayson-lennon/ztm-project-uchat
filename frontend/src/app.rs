@@ -15,6 +15,8 @@ pub static TOASTER: AtomRef<Toaster> = |_| Toaster::default();
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
+    let api_client = ApiClient::global();
+
     let toaster = use_toaster(cx);
 
     cx.render(rsx! {
@@ -23,6 +25,7 @@ pub fn App(cx: Scope) -> Element {
             Route { to: page::ACCOUNT_LOGIN, page::Login {} },
             Route { to: page::HOME, page::Home {} },
             Route { to: page::POST_NEW_CHAT, page::NewChat {} },
+            Route { to: page::POSTS_TRENDING, page::Trending {} },
 
             ToastRoot { toaster: toaster },
             Navbar {}
