@@ -184,3 +184,45 @@ pub fn get_reaction(
             .optional()
     }
 }
+
+#[derive(Clone, Debug, Serialize)]
+pub struct AggregatePostInfo {
+    pub post_id: PostId,
+    pub likes: i64,
+    pub dislikes: i64,
+    pub boosts: i64,
+}
+
+pub fn aggregate_reactions(
+    conn: &mut PgConnection,
+    post_id: PostId,
+) -> Result<AggregatePostInfo, DieselError> {
+    let pid = post_id;
+
+    let (likes, dislikes) = {
+        use crate::schema::reactions::dsl::*;
+        let likes = reactions
+            .filter(post_id.eq(pid))
+            .filter(like_status.eq(1))
+            .count()
+            .get_result(conn)?;
+        let dislikes = reactions
+            .filter(post_id.eq(pid))
+            .filter(like_status.eq(-1))
+            .count()
+            .get_result(conn)?;
+        (likes, dislikes)
+    };
+
+    let boosts = {
+        use crate::schema::boosts::dsl::*;
+        boosts.filter(post_id.eq(pid)).count().get_result(conn)?
+    };
+
+    Ok(AggregatePostInfo {
+        post_id: pid,
+        likes,
+        dislikes,
+        boosts,
+    })
+}
