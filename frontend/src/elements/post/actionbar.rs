@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use crate::prelude::*;
+use crate::{elements::post::quick_respond::QuickRespond, prelude::*};
 use dioxus::prelude::*;
 use uchat_domain::ids::PostId;
 use uchat_endpoint::post::types::LikeStatus;
@@ -197,8 +197,41 @@ pub fn Bookmark(cx: Scope, post_id: PostId, bookmarked: bool) -> Element {
 }
 
 #[inline_props]
+pub fn Comment(cx: Scope, opened: UseState<bool>) -> Element {
+    let comment_onclick = sync_handler!([opened], move |_| {
+        let current = *opened.get();
+        opened.set(!current);
+    });
+
+    cx.render(rsx! {
+        div {
+            class: "cursor-pointer",
+            onclick: comment_onclick,
+            img {
+                class: "actionbar-icon",
+                src: "/static/icons/icon-messages.svg",
+            }
+        }
+    })
+}
+
+#[inline_props]
+pub fn QuickRespondBox(cx: Scope, post_id: PostId, opened: UseState<bool>) -> Element {
+    let element = match *opened.get() {
+        true => {
+            to_owned![opened, post_id];
+            Some(rsx! { QuickRespond { post_id: post_id, opened: opened } })
+        }
+        false => None,
+    };
+
+    cx.render(rsx! {element})
+}
+
+#[inline_props]
 pub fn Actionbar(cx: Scope, post_id: PostId) -> Element {
     let post_manager = use_post_manager(cx);
+    let quick_respond_opened = use_state(cx, || false).clone();
 
     let this_post = post_manager.read();
     let this_post = this_post.get(&post_id).unwrap();
@@ -223,8 +256,13 @@ pub fn Actionbar(cx: Scope, post_id: PostId) -> Element {
                 dislikes: this_post.dislikes,
                 like_status: this_post.like_status,
             }
-            // comment
+            Comment {
+                opened: quick_respond_opened.clone(),
+            }
         }
-        // quick respond
+        QuickRespondBox {
+            post_id: this_post.id,
+            opened: quick_respond_opened,
+        }
     })
 }
