@@ -5,8 +5,8 @@ use tracing::info;
 use uchat_domain::{ids::*, Username};
 use uchat_endpoint::{
     post::{
-        endpoint::{NewPost, NewPostOk, TrendingPosts, TrendingPostsOk},
-        types::{LikeStatus, PublicPost},
+        endpoint::{Bookmark, BookmarkOk, NewPost, NewPostOk, TrendingPosts, TrendingPostsOk},
+        types::{BookmarkAction, LikeStatus, PublicPost},
     },
     user::endpoint::{CreateUser, CreateUserOk, Login, LoginOk},
     RequestFailed,
@@ -110,5 +110,21 @@ impl AuthorizedApiRequest for TrendingPosts {
         }
 
         Ok((StatusCode::OK, Json(TrendingPostsOk { posts })))
+    }
+}
+
+#[async_trait]
+impl AuthorizedApiRequest for Bookmark {
+    type Response = (StatusCode, Json<BookmarkOk>);
+    async fn process_request(
+        self,
+        DbConnection(mut conn): DbConnection,
+        session: UserSession,
+        state: AppState,
+    ) -> ApiResult<Self::Response> {
+        match self.action {
+            BookmarkAction::Add => {}
+            BookmarkAction::Remove => {}
+        }
     }
 }
