@@ -123,8 +123,19 @@ impl AuthorizedApiRequest for Bookmark {
         state: AppState,
     ) -> ApiResult<Self::Response> {
         match self.action {
-            BookmarkAction::Add => {}
-            BookmarkAction::Remove => {}
+            BookmarkAction::Add => {
+                uchat_query::post::bookmark(&mut conn, session.user_id, self.post_id)?;
+            }
+            BookmarkAction::Remove => {
+                uchat_query::post::delete_bookmark(&mut conn, session.user_id, self.post_id)?;
+            }
         }
+
+        Ok((
+            StatusCode::OK,
+            Json(BookmarkOk {
+                status: self.action,
+            }),
+        ))
     }
 }

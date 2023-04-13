@@ -20,6 +20,24 @@ pub fn Bookmark(cx: Scope, post_id: PostId, bookmarked: bool) -> Element {
         [api_client, post_manager, toaster, post_id],
         move |_| async move {
             use uchat_endpoint::post::endpoint::{Bookmark, BookmarkOk};
+            use uchat_endpoint::post::types::BookmarkAction;
+            let action = match post_manager.read().get(&post_id).unwrap().bookmarked {
+                true => BookmarkAction::Remove,
+                false => BookmarkAction::Add,
+            };
+
+            let request = Bookmark { action, post_id };
+            match fetch_json!(<BookmarkOk>, api_client, request) {
+                Ok(res) => {
+                    post_manager.write().update(post_id, |post| {
+                        post.bookmarked = res.status.into();
+                    });
+                }
+                Err(e) => toaster.write().error(
+                    format!("Failed to bookmark post: {}", e),
+                    chrono::Duration::seconds(3),
+                ),
+            }
         }
     );
 
