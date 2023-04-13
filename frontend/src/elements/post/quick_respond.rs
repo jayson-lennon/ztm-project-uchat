@@ -44,38 +44,44 @@ pub fn QuickRespond(cx: Scope, post_id: PostId, opened: UseState<bool>) -> Eleme
 
     let message = use_state(cx, || "".to_string());
 
-    let form_onsubmit = async_handler!(&cx, [api_client, toaster], move |_| async move {
-        use uchat_domain::post::Message;
-        use uchat_endpoint::post::endpoint::{NewPost, NewPostOk};
-        use uchat_endpoint::post::types::{Chat, NewPostOptions};
+    let form_onsubmit = async_handler!(
+        &cx,
+        [api_client, toaster, message, opened],
+        move |_| async move {
+            use uchat_domain::post::Message;
+            use uchat_endpoint::post::endpoint::{NewPost, NewPostOk};
+            use uchat_endpoint::post::types::{Chat, NewPostOptions};
 
-        let request = NewPost {
-            content: Chat {
-                headline: None,
-                message: Message::new(message.get()).unwrap(),
-            }
-            .into(),
-            options: NewPostOptions::default(),
-        };
-        let response = fetch_json!(<NewPostOk>, api_client, request);
-        match response {
-            Ok(_) => {
-                toaster.write().success("Posted!", Duration::seconds(3));
-                opened.set(false);
-            }
-            Err(e) => {
-                toaster
-                    .write()
-                    .error(format!("Reply failed: {e}"), Duration::seconds(3));
+            let request = NewPost {
+                content: Chat {
+                    headline: None,
+                    message: Message::new(message.get()).unwrap(),
+                }
+                .into(),
+                options: NewPostOptions::default(),
+            };
+            let response = fetch_json!(<NewPostOk>, api_client, request);
+            match response {
+                Ok(_) => {
+                    toaster.write().success("Posted!", Duration::seconds(3));
+                    opened.set(false);
+                }
+                Err(e) => {
+                    toaster
+                        .write()
+                        .error(format!("Reply failed: {e}"), Duration::seconds(3));
+                }
             }
         }
-    });
+    );
 
     let submit_cursor = if can_submit(message.get()) {
         "cursor-pointer"
     } else {
         "cursor-not-allowed"
     };
+
+    let submit_btn_style = maybe_class!("btn-disabled", !can_submit(message.get()));
 
     cx.render(rsx! {
         form {
@@ -90,7 +96,7 @@ pub fn QuickRespond(cx: Scope, post_id: PostId, opened: UseState<bool>) -> Eleme
             div {
                 class: "w-full flex flex-row justify-end",
                 button {
-                    class: "mt-2 btn {submit_cursor}",
+                    class: "mt-2 btn {submit_cursor} {submit_btn_style}",
                     r#type: "submit",
                     disabled: !can_submit(message.get()),
                     "Respond"
