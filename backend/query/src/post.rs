@@ -139,3 +139,48 @@ pub fn get_bookmark(
             })
     }
 }
+
+#[derive(Clone, Debug, DieselNewType, Deserialize, Serialize)]
+pub struct ReactionData(serde_json::Value);
+
+#[derive(Clone, Debug, Queryable, Insertable, Deserialize, Serialize)]
+#[diesel(table_name = schema::reactions)]
+pub struct Reaction {
+    pub user_id: UserId,
+    pub post_id: PostId,
+    pub created_at: DateTime<Utc>,
+    pub like_status: i16,
+    pub reaction: Option<ReactionData>,
+}
+
+pub fn react(conn: &mut PgConnection, reaction: Reaction) -> Result<(), DieselError> {
+    use crate::schema::reactions;
+
+    diesel::insert_into(reactions::table)
+        .values(&reaction)
+        .on_conflict((reactions::user_id, reactions::post_id))
+        .do_update()
+        .set((
+            reactions::like_status.eq(&reaction.like_status),
+            reactions::reaction.eq(&reaction.reaction),
+        ))
+        .execute(conn)
+        .map(|_| ())
+}
+
+pub fn get_reaction(
+    conn: &mut PgConnection,
+    post_id: PostId,
+    user_id: UserId,
+) -> Result<Option<Reaction>, DieselError> {
+    let pid = post_id;
+    let uid = user_id;
+    {
+        use crate::schema::reactions::dsl::*;
+        reactions
+            .filter(post_id.eq(pid))
+            .filter(user_id.eq(uid))
+            .get_result(conn)
+            .optional()
+    }
+}
