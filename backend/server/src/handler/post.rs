@@ -5,7 +5,10 @@ use tracing::info;
 use uchat_domain::{ids::*, Username};
 use uchat_endpoint::{
     post::{
-        endpoint::{Bookmark, BookmarkOk, NewPost, NewPostOk, TrendingPosts, TrendingPostsOk},
+        endpoint::{
+            Bookmark, BookmarkOk, NewPost, NewPostOk, React, ReactOk, TrendingPosts,
+            TrendingPostsOk,
+        },
         types::{BookmarkAction, LikeStatus, PublicPost},
     },
     user::endpoint::{CreateUser, CreateUserOk, Login, LoginOk},
@@ -140,6 +143,42 @@ impl AuthorizedApiRequest for Bookmark {
             StatusCode::OK,
             Json(BookmarkOk {
                 status: self.action,
+            }),
+        ))
+    }
+}
+
+#[async_trait]
+impl AuthorizedApiRequest for React {
+    type Response = (StatusCode, Json<ReactOk>);
+    async fn process_request(
+        self,
+        DbConnection(mut conn): DbConnection,
+        session: UserSession,
+        state: AppState,
+    ) -> ApiResult<Self::Response> {
+        use uchat_endpoint::post::types::LikeStatus;
+
+        let reaction = uchat_query::post::Reaction {
+            post_id: self.post_id,
+            user_id: session.user_id,
+            reaction: None,
+            like_status: match self.like_status {
+                LikeStatus::Like => 1,
+                LikeStatus::Dislike => -1,
+                LikeStatus::NoReaction => 0,
+            },
+            created_at: Utc::now(),
+        };
+
+        uchat_query::post::react(&mut conn, reaction)?;
+
+        Ok((
+            StatusCode::OK,
+            Json(ReactOk {
+                like_status: self.like_status,
+                likes: 0,
+                dislikes: 0,
             }),
         ))
     }
