@@ -6,10 +6,10 @@ use uchat_domain::{ids::*, Username};
 use uchat_endpoint::{
     post::{
         endpoint::{
-            Bookmark, BookmarkOk, NewPost, NewPostOk, React, ReactOk, TrendingPosts,
-            TrendingPostsOk,
+            Bookmark, BookmarkOk, Boost, BoostOk, NewPost, NewPostOk, React, ReactOk,
+            TrendingPosts, TrendingPostsOk,
         },
-        types::{BookmarkAction, LikeStatus, PublicPost},
+        types::{BookmarkAction, BoostAction, LikeStatus, PublicPost},
     },
     user::endpoint::{CreateUser, CreateUserOk, Login, LoginOk},
     RequestFailed,
@@ -193,6 +193,33 @@ impl AuthorizedApiRequest for React {
                 like_status: self.like_status,
                 likes: aggregate_reactions.likes,
                 dislikes: aggregate_reactions.dislikes,
+            }),
+        ))
+    }
+}
+
+#[async_trait]
+impl AuthorizedApiRequest for Boost {
+    type Response = (StatusCode, Json<BoostOk>);
+    async fn process_request(
+        self,
+        DbConnection(mut conn): DbConnection,
+        session: UserSession,
+        state: AppState,
+    ) -> ApiResult<Self::Response> {
+        match self.action {
+            BoostAction::Add => {
+                uchat_query::post::boost(&mut conn, session.user_id, self.post_id, Utc::now())?;
+            }
+            BoostAction::Remove => {
+                uchat_query::post::delete_boost(&mut conn, session.user_id, self.post_id)?;
+            }
+        }
+
+        Ok((
+            StatusCode::OK,
+            Json(BoostOk {
+                status: self.action,
             }),
         ))
     }
