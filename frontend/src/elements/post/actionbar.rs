@@ -29,8 +29,8 @@ pub fn LikeDislike(
 
     let like_onclick = async_handler!(
         &cx,
-        [api_client, post_manager, toaster, post_id, like_status],
-        move |_| async move {
+        [api_client, post_manager, toaster, post_id],
+        move |like_status| async move {
             use uchat_endpoint::post::endpoint::{React, ReactOk};
 
             let like_status = {
@@ -62,7 +62,30 @@ pub fn LikeDislike(
     );
 
     cx.render(rsx! {
-        "react"
+        div {
+            class: "cursor-pointer",
+            onclick: move |_| like_onclick(LikeStatus::Like),
+            img {
+                class: "actionbar-icon",
+                src: "{like_icon}",
+            },
+            div {
+                class: "text-center",
+                "{likes}"
+            }
+        },
+        div {
+            class: "cursor-pointer",
+            onclick: move |_| like_onclick(LikeStatus::Dislike),
+            img {
+                class: "actionbar-icon",
+                src: "{dislike_icon}",
+            },
+            div {
+                class: "text-center",
+                "{dislikes}"
+            }
+        }
     })
 }
 
@@ -130,8 +153,13 @@ pub fn Actionbar(cx: Scope, post_id: PostId) -> Element {
             Bookmark {
                 bookmarked: this_post.bookmarked,
                 post_id: this_post_id,
+            },
+            LikeDislike {
+                post_id: this_post.id,
+                likes: this_post.likes,
+                dislikes: this_post.dislikes,
+                like_status: this_post.like_status,
             }
-            // like & dislike
             // comment
         }
         // quick respond
