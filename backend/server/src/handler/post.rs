@@ -56,7 +56,18 @@ pub fn to_public(
                     None => None,
                 }
             },
-            like_status: LikeStatus::NoReaction,
+            like_status: {
+                match session {
+                    Some(session) => {
+                        match query_post::get_reaction(conn, post.id, session.user_id)? {
+                            Some(reaction) if reaction.like_status == -1 => LikeStatus::Dislike,
+                            Some(reaction) if reaction.like_status == 1 => LikeStatus::Like,
+                            _ => LikeStatus::NoReaction,
+                        }
+                    }
+                    None => LikeStatus::NoReaction,
+                }
+            },
             bookmarked: {
                 match session {
                     Some(session) => query_post::get_bookmark(conn, session.user_id, post.id)?,
