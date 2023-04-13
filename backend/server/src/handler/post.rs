@@ -74,7 +74,12 @@ pub fn to_public(
                     None => false,
                 }
             },
-            boosted: false,
+            boosted: {
+                match session {
+                    Some(session) => query_post::get_boost(conn, session.user_id, post.id)?,
+                    None => false,
+                }
+            },
             likes: aggregate_reactions.likes,
             dislikes: aggregate_reactions.dislikes,
             boosts: aggregate_reactions.boosts,
