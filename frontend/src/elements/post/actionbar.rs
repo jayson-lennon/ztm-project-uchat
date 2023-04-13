@@ -3,6 +3,68 @@
 use crate::prelude::*;
 use dioxus::prelude::*;
 use uchat_domain::ids::PostId;
+use uchat_endpoint::post::types::LikeStatus;
+
+#[inline_props]
+pub fn LikeDislike(
+    cx: Scope,
+    post_id: PostId,
+    like_status: LikeStatus,
+    likes: i64,
+    dislikes: i64,
+) -> Element {
+    let post_manager = use_post_manager(cx);
+    let toaster = use_toaster(cx);
+    let api_client = ApiClient::global();
+
+    let like_icon = match like_status {
+        LikeStatus::Like => "/static/icons/icon-like-selected.svg",
+        _ => "/static/icons/icon-like.svg",
+    };
+
+    let dislike_icon = match like_status {
+        LikeStatus::Dislike => "/static/icons/icon-dislike-selected.svg",
+        _ => "/static/icons/icon-dislike.svg",
+    };
+
+    let like_onclick = async_handler!(
+        &cx,
+        [api_client, post_manager, toaster, post_id, like_status],
+        move |_| async move {
+            use uchat_endpoint::post::endpoint::{React, ReactOk};
+
+            let like_status = {
+                if post_manager.read().get(&post_id).unwrap().like_status == like_status {
+                    LikeStatus::NoReaction
+                } else {
+                    like_status
+                }
+            };
+
+            let request = React {
+                like_status,
+                post_id,
+            };
+            match fetch_json!(<ReactOk>, api_client, request) {
+                Ok(res) => {
+                    post_manager.write().update(post_id, |post| {
+                        post.like_status = res.like_status;
+                        post.likes = res.likes;
+                        post.dislikes = res.dislikes;
+                    });
+                }
+                Err(e) => toaster.write().error(
+                    format!("Failed to react to post post: {}", e),
+                    chrono::Duration::seconds(3),
+                ),
+            }
+        }
+    );
+
+    cx.render(rsx! {
+        "react"
+    })
+}
 
 #[inline_props]
 pub fn Bookmark(cx: Scope, post_id: PostId, bookmarked: bool) -> Element {
