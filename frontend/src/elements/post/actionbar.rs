@@ -65,7 +65,10 @@ pub fn Actionbar(cx: Scope, post_id: PostId) -> Element {
         div {
             class: "flex flex-row justify-between w-full opacity-70 mt-4",
             // boost
-            // bookmark
+            Bookmark {
+                bookmarked: this_post.bookmarked,
+                post_id: this_post_id,
+            }
             // like & dislike
             // comment
         }

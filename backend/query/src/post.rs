@@ -115,3 +115,27 @@ pub fn delete_bookmark(
             })
     }
 }
+
+pub fn get_bookmark(
+    conn: &mut PgConnection,
+    user_id: UserId,
+    post_id: PostId,
+) -> Result<bool, DieselError> {
+    let uid = user_id;
+    let pid = post_id;
+    {
+        use crate::schema::bookmarks::dsl::*;
+        use diesel::dsl::count;
+
+        bookmarks
+            .filter(post_id.eq(pid))
+            .filter(user_id.eq(uid))
+            .select(count(post_id))
+            .get_result(conn)
+            .optional()
+            .map(|n: Option<i64>| match n {
+                Some(n) => n == 1,
+                None => false,
+            })
+    }
+}

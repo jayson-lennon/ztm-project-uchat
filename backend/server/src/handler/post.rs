@@ -53,7 +53,12 @@ pub fn to_public(
                 }
             },
             like_status: LikeStatus::NoReaction,
-            bookmarked: false,
+            bookmarked: {
+                match session {
+                    Some(session) => query_post::get_bookmark(conn, session.user_id, post.id)?,
+                    None => false,
+                }
+            },
             boosted: false,
             likes: 0,
             dislikes: 0,
