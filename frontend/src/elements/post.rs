@@ -7,6 +7,7 @@ use indexmap::IndexMap;
 use uchat_domain::ids::PostId;
 use uchat_endpoint::post::types::PublicPost;
 
+pub mod actionbar;
 pub mod content;
 
 pub fn use_post_manager(cx: &ScopeState) -> &UseAtomRef<PostManager> {
