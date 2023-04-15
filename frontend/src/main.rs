@@ -12,7 +12,7 @@ pub mod page;
 use cfg_if::cfg_if;
 use util::ApiClient;
 
-pub const ROOT_API_URL: &str = "http://127.0.0.1:8070/";
+pub const ROOT_API_URL: &str = uchat_endpoint::app_url::API_URL;
 
 cfg_if! {
     if #[cfg(feature = "console_log")] {
