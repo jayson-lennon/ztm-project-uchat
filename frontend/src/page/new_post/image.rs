@@ -1,10 +1,11 @@
 #![allow(non_snake_case)]
 
-use crate::{fetch_json, prelude::*};
+use crate::{fetch_json, prelude::*, util};
 use chrono::Duration;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 use uchat_endpoint::post::types::{Image, ImageKind, NewPostOptions};
+use web_sys::HtmlInputElement;
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct PageState {
@@ -26,6 +27,43 @@ impl PageState {
 
         true
     }
+}
+
+#[inline_props]
+pub fn ImageInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
+    let toaster = use_toaster(cx);
+
+    cx.render(rsx! {
+        div {
+            label {
+                r#for: "image-input",
+                "Upload Image"
+            },
+            input {
+                class: "w-full",
+                id: "image-input",
+                r#type: "file",
+                accept: "image/*",
+                oninput: |_| {
+                    to_owned![page_state, toaster];
+                    async move {
+                        use gloo_file::{File, futures::read_as_data_url};
+                        use wasm_bindgen::JsCast;
+
+                        let el = util::document()
+                            .get_element_by_id("image-input")
+                            .unwrap()
+                            .unchecked_into::<HtmlInputElement>();
+                        let file: File = el.files().unwrap().get(0).unwrap().into();
+                        match read_as_data_url(&file).await {
+                            Ok(data) => page_state.with_mut(|state| state.image = Some(data)),
+                            Err(e) => toaster.write().error(format!("Error loading file: {e}"), chrono::Duration::seconds(5)),
+                        }
+                    }
+                }
+            }
+        }
+    })
 }
 
 #[inline_props]
@@ -118,7 +156,7 @@ pub fn NewImage(cx: Scope) -> Element {
             class: "flex flex-col gap-4",
             onsubmit: form_onsubmit,
             prevent_default: "onsubmit",
-            // image input
+            ImageInput { page_state: page_state.clone() },
             // image preview
             CaptionInput { page_state: page_state.clone() },
             button {
