@@ -25,11 +25,7 @@ thiserror = "1.0.38"
 tokio = { version = "1.25.0", features = ["full"] }
 tower = "0.4.13"
 tower-http = { version = "0.4.0", features = [
-  "compression-gzip",
-  "cors",
-  "decompression-gzip",
-  "fs",
-  "trace",
+  "full",
 ] }
 tracing = { version = "0.1.37", features = ["attributes"] }
 tracing-error = "0.2.0"
