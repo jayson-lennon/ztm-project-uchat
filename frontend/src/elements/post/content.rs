@@ -32,6 +32,7 @@ pub fn Content<'a>(cx: Scope<'a>, post: &'a PublicPost) -> Element {
         div {
             match &post.content {
                 EndpointContent::Chat(content) => rsx! { Chat { post_id: post.id, content: content} },
+                _ => rsx! { "" }
             }
         }
     })
