@@ -67,6 +67,31 @@ pub fn ImageInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
 }
 
 #[inline_props]
+pub fn ImagePreview(cx: Scope, page_state: UseRef<PageState>) -> Element {
+    let image_data = page_state.read().clone().image;
+    let Preview = if let Some(ref image) = image_data {
+        rsx! {
+            img {
+                class: "max-w-[calc(var(--content-max-width)/2)]
+                        max-h-[40vh]",
+                src: "{image}"
+            }
+        }
+    } else {
+        rsx! {
+            div { "no image uploaded" }
+        }
+    };
+
+    cx.render(rsx! {
+        div {
+            class: "flex flex-row justify-center",
+            Preview
+        }
+    })
+}
+
+#[inline_props]
 pub fn CaptionInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
     use uchat_domain::post::Caption;
 
@@ -157,7 +182,7 @@ pub fn NewImage(cx: Scope) -> Element {
             onsubmit: form_onsubmit,
             prevent_default: "onsubmit",
             ImageInput { page_state: page_state.clone() },
-            // image preview
+            ImagePreview { page_state: page_state.clone() },
             CaptionInput { page_state: page_state.clone() },
             button {
                 class: "btn {submit_btn_style}",

@@ -122,8 +122,18 @@ macro_rules! fetch_json {
                 if res.status().is_success() {
                     Ok(res.json::<$target>().await.unwrap())
                 } else {
-                    let err_payload = res.json::<uchat_endpoint::RequestFailed>().await.unwrap();
-                    Err(RequestError::BadRequest(err_payload))
+                    let status = res.status();
+                    match res.json::<uchat_endpoint::RequestFailed>().await {
+                        Ok(payload) => Err(RequestError::BadRequest(payload)),
+                        Err(_) => Err(RequestError::BadRequest(uchat_endpoint::RequestFailed {
+                            msg: {
+                                status
+                                    .canonical_reason()
+                                    .unwrap_or_else(|| "An error occurred. Please try again.")
+                                    .to_string()
+                            },
+                        })),
+                    }
                 }
             }
             Err(e) => Err(e),
