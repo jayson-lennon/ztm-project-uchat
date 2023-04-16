@@ -6,7 +6,11 @@ use crate::{fetch_json, prelude::*, util};
 use chrono::Duration;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
-use uchat_domain::post::{PollChoiceDescription, PollHeadline};
+use uchat_domain::{
+    ids::PollChoiceId,
+    post::{PollChoiceDescription, PollHeadline},
+};
+use uchat_endpoint::post::types::{NewPostOptions, Poll, PollChoice};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PageState {
@@ -96,6 +100,72 @@ pub fn HeadlineInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
     })
 }
 
+#[inline_props]
+pub fn PollChoices(cx: Scope, page_state: UseRef<PageState>) -> Element {
+    let choices = page_state
+        .read()
+        .poll_choices
+        .iter()
+        .map(|(&key, choice)| {
+            let choice = choice.clone();
+            let max_chars = PollChoiceDescription::MAX_CHARS;
+            let wrong_len = maybe_class!(
+                "err-text-color",
+                PollChoiceDescription::new(&choice).is_err()
+            );
+            rsx! {
+                li {
+                    key: "{key}",
+                    div {
+                        class: "grid grid-cols-[1fr_3rem_3rem] w-full gap-2 items-center h-8",
+                        input {
+                            class: "input-field",
+                            placeholder: "Choice Description",
+                            oninput: move |ev| {
+                                page_state.with_mut(|state| state.replace_choice(key, &ev.data.value))
+                            },
+                            value: "{choice}",
+                        }
+                        div {
+                            class: "text-right {wrong_len}",
+                            "{choice.len()}/{max_chars}"
+                        }
+                        button {
+                            class: "btn p-0 h-full bg-red-700",
+                            prevent_default: "onclick",
+                            onclick: move |_| {
+                                page_state.with_mut(|state| state.poll_choices.remove(&key));
+                            },
+                            "X"
+                        }
+                    }
+                }
+            }
+        }).collect::<Vec<LazyNodes>>();
+
+    cx.render(rsx! {
+        div {
+            class: "flex flex-col gap-2",
+            "Poll Choices",
+            ol {
+                class: "list-decimal ml-4 flex flex-col gap-2",
+                choices.into_iter()
+            },
+            div {
+                class: "flex flex-row justify-end",
+                button {
+                    class: "btn w-12",
+                    prevent_default: "onclick",
+                    onclick: move |_| {
+                        page_state.with_mut(|state| state.push_choice(""))
+                    },
+                    "+"
+                }
+            }
+        }
+    })
+}
+
 pub fn NewPoll(cx: Scope) -> Element {
     let api_client = ApiClient::global();
     let router = use_router(cx);
@@ -111,7 +181,35 @@ pub fn NewPoll(cx: Scope) -> Element {
 
             let request = NewPost {
                 content: Poll {
-                    // todo
+                    headline: {
+                        let headline = &page_state.read().headline;
+                        PollHeadline::new(headline).unwrap()
+                    },
+                    choices: {
+                        let sorted_choices = {
+                            let mut choices = page_state
+                                .read()
+                                .poll_choices
+                                .iter()
+                                .map(|(id, choice)| (*id, choice.clone()))
+                                .collect::<Vec<(usize, String)>>();
+                            choices.sort_unstable_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+                            choices
+                        };
+                        sorted_choices
+                            .iter()
+                            .map(|(_, choice)| {
+                                let id = PollChoiceId::new();
+                                let choice = PollChoice {
+                                    id,
+                                    num_votes: 0,
+                                    description: PollChoiceDescription::new(choice).unwrap(),
+                                };
+                                choice
+                            })
+                            .collect::<Vec<PollChoice>>()
+                    },
+                    voted: None,
                 }
                 .into(),
                 options: NewPostOptions::default(),
@@ -139,7 +237,7 @@ pub fn NewPoll(cx: Scope) -> Element {
             onsubmit: form_onsubmit,
             prevent_default: "onsubmit",
             HeadlineInput { page_state: page_state.clone() },
-            // poll choices
+            PollChoices { page_state: page_state.clone() },
             button {
                 class: "btn {submit_btn_style}",
                 r#type: "submit",
