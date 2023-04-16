@@ -48,10 +48,27 @@ impl Post {
 
 pub fn new(conn: &mut PgConnection, post: Post) -> Result<PostId, DieselError> {
     conn.transaction::<PostId, DieselError, _>(|conn| {
+        use uchat_endpoint::post::types::Content as EndpointContent;
         diesel::insert_into(schema::posts::table)
             .values(&post)
-            .execute(conn);
-        Ok(post.id)
+            .execute(conn)?;
+        match serde_json::from_value::<EndpointContent>(post.content.0) {
+            Ok(EndpointContent::Poll(poll)) => {
+                for choice in &poll.choices {
+                    use schema::poll_choices::{self, columns as col};
+
+                    diesel::insert_into(poll_choices::table)
+                        .values((
+                            col::id.eq(choice.id),
+                            col::choice.eq(choice.description.as_ref()),
+                            col::post_id.eq(post.id),
+                        ))
+                        .execute(conn)?;
+                }
+                Ok(post.id)
+            }
+            _ => Ok(post.id),
+        }
     })
 }
 
