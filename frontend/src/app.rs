@@ -34,6 +34,7 @@ pub fn App(cx: Scope) -> Element {
                 Route { to: page::HOME, page::Home {} },
                 Route { to: page::POST_NEW_CHAT, page::NewChat {} },
                 Route { to: page::POST_NEW_IMAGE, page::NewImage {} },
+                Route { to: page::POST_NEW_POLL, page::NewPoll {} },
                 Route { to: page::POSTS_TRENDING, page::Trending {} },
             }
 
