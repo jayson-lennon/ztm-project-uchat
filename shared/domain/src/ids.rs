@@ -65,3 +65,4 @@ new_id!(UserId);
 new_id!(PostId);
 new_id!(SessionId);
 new_id!(ImageId);
+new_id!(PollChoiceId);
