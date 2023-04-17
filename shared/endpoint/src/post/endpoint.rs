@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
-use uchat_domain::ids::PostId;
+use uchat_domain::ids::{PollChoiceId, PostId};
 
 use crate::Endpoint;
 
-use super::types::{BookmarkAction, BoostAction, Content, LikeStatus, NewPostOptions, PublicPost};
+use super::types::{
+    BookmarkAction, BoostAction, Content, LikeStatus, NewPostOptions, PublicPost, VoteCast,
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct NewPost {
@@ -57,4 +59,15 @@ pub struct Boost {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct BoostOk {
     pub status: BoostAction,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct Vote {
+    pub post_id: PostId,
+    pub choice_id: PollChoiceId,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct VoteOk {
+    pub cast: VoteCast,
 }
