@@ -57,6 +57,21 @@ impl PostManager {
     pub fn remove(&mut self, post_id: &PostId) {
         self.posts.remove(post_id);
     }
+
+    pub fn all_to_public<'a, 'b>(&self) -> Vec<LazyNodes<'a, 'b>> {
+        self.posts
+            .iter()
+            .map(|(&id, _)| {
+                rsx! {
+                    div {
+                        PublicPostEntry {
+                            post_id: id
+                        }
+                    }
+                }
+            })
+            .collect()
+    }
 }
 
 #[inline_props]
