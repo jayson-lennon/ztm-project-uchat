@@ -21,7 +21,10 @@ pub fn NewPostPopup(cx: Scope, hide: UseState<bool>) -> Element {
                     navbar-bg-color text-white text-sm",
             div {
                 class: BUTTON_CLASS,
-                onclick: move |_| (),
+                onclick: move |_| {
+                    router.navigate_to(page::POST_NEW_POLL);
+                    hide.set(true);
+                },
                 img {
                     class: "invert",
                     src: "/static/icons/icon-poll.svg",
@@ -30,7 +33,11 @@ pub fn NewPostPopup(cx: Scope, hide: UseState<bool>) -> Element {
             }
             div {
                 class: BUTTON_CLASS,
-                onclick: move |_| (),
+                onclick: move |_| {
+                    router.navigate_to(page::POST_NEW_IMAGE);
+                    hide.set(true);
+                },
+
                 img {
                     class: "invert",
                     src: "/static/icons/icon-image.svg",

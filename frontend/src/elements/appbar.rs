@@ -27,7 +27,7 @@ where
     cx.render(rsx! {
         button {
             class: "flex flex-col w-10 h-14
-                justify-end items-center border-slate-200
+                justify-end items-center 
                 border-b-4 {append_class}",
             disabled: cx.props.disabled.unwrap_or_default(),
             onclick: |ev| {

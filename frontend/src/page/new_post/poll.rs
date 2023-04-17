@@ -223,6 +223,37 @@ pub fn NewPoll(cx: Scope) -> Element {
     let submit_btn_style = maybe_class!("btn-disabled", !page_state.read().can_submit());
 
     cx.render(rsx! {
+        Appbar {
+            title: "New Poll",
+            AppbarImgButton {
+                click_handler: move |_| router.replace_route(page::POST_NEW_CHAT, None, None),
+                img: "/static/icons/icon-messages.svg",
+                label: "Chat",
+                title: "Post a new chat",
+            },
+            AppbarImgButton {
+                click_handler: move |_| router.replace_route(page::POST_NEW_IMAGE, None, None),
+                img: "/static/icons/icon-image.svg",
+                label: "Image",
+                title: "Post a new image",
+            },
+            AppbarImgButton {
+                click_handler: move |_| (),
+                img: "/static/icons/icon-poll.svg",
+                label: "Poll",
+                disabled: true,
+                title: "Post a new poll",
+                append_class: appbar::BUTTON_SELECTED,
+            },
+            AppbarImgButton {
+                click_handler: move |_| router.pop_route(),
+                img: "/static/icons/icon-back.svg",
+                label: "Back",
+                title: "Go to the previous page",
+            }
+        },
+
+
         form {
             class: "flex flex-col gap-4",
             onsubmit: form_onsubmit,
