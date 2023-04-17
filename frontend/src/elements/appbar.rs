@@ -3,6 +3,8 @@
 use crate::prelude::*;
 use dioxus::prelude::*;
 
+pub const BUTTON_SELECTED: &str = "border-slate-600";
+
 #[derive(Props)]
 pub struct AppbarImgButtonProps<'a, F>
 where
@@ -56,7 +58,7 @@ pub fn Appbar<'a>(cx: Scope<'a, AppbarProps<'a>>) -> Element {
     cx.render(rsx! {
         div {
             class: "max-w-[var(--content-max-width)] h-[var(--appbar-height)]
-                    fixed top-0 right-0 mx-auto z-50
+                    fixed top-0 right-0 left-0 mx-auto z-50
                     bg-slate-200",
             div {
                 class: "flex flex-row gap-8 items-center w-full pr-5 h-full",
