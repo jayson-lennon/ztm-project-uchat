@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  --appbar-height: 3.5rem;
   --navbar-height: 3.8rem;
   --content-min-width: 300px;
   --content-max-width: 576px;
@@ -39,5 +40,9 @@
 
   .err-text-color {
     @apply text-red-700;
+  }
+
+  .profile-portrait {
+    @apply object-cover rounded-md w-14 h-14;
   }
 }
