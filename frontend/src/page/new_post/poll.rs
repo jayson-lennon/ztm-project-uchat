@@ -186,26 +186,17 @@ pub fn NewPoll(cx: Scope) -> Element {
                         PollHeadline::new(headline).unwrap()
                     },
                     choices: {
-                        let sorted_choices = {
-                            let mut choices = page_state
-                                .read()
-                                .poll_choices
-                                .iter()
-                                .map(|(id, choice)| (*id, choice.clone()))
-                                .collect::<Vec<(usize, String)>>();
-                            choices.sort_unstable_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
-                            choices
-                        };
-                        sorted_choices
-                            .iter()
-                            .map(|(_, choice)| {
+                        page_state
+                            .read()
+                            .poll_choices
+                            .values()
+                            .map(|choice| {
                                 let id = PollChoiceId::new();
-                                let choice = PollChoice {
+                                PollChoice {
                                     id,
                                     num_votes: 0,
                                     description: PollChoiceDescription::new(choice).unwrap(),
-                                };
-                                choice
+                                }
                             })
                             .collect::<Vec<PollChoice>>()
                     },
