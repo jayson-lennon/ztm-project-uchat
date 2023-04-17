@@ -382,3 +382,45 @@ pub fn get_poll_results(
         })
     }
 }
+
+pub fn get_home_posts(conn: &mut PgConnection, user_id: UserId) -> Result<Vec<Post>, DieselError> {
+    use crate::schema::{boosts, followers, posts};
+
+    let uid = user_id;
+
+    let on_schedule = posts::time_posted.lt(Utc::now());
+    let public_only = posts::direct_message_to.is_null();
+    let order = posts::time_posted.desc();
+    let limit = 30;
+
+    let post_fields = (
+        posts::id,
+        posts::user_id,
+        posts::content,
+        posts::time_posted,
+        posts::direct_message_to,
+        posts::reply_to,
+        posts::created_at,
+    );
+
+    followers::table
+        .filter(followers::user_id.eq(uid))
+        .inner_join(posts::table.on(followers::follows.eq(posts::user_id)))
+        .filter(on_schedule)
+        .filter(public_only)
+        .select(post_fields)
+        .order(order)
+        .limit(limit)
+        .union(
+            followers::table
+                .filter(followers::user_id.eq(uid))
+                .inner_join(boosts::table.on(boosts::user_id.eq(followers::follows)))
+                .inner_join(posts::table.on(posts::id.eq(boosts::post_id)))
+                .filter(on_schedule)
+                .filter(public_only)
+                .select(post_fields)
+                .order(order)
+                .limit(limit),
+        )
+        .get_results(conn)
+}
