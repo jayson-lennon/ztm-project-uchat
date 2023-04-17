@@ -91,10 +91,37 @@ pub fn Poll<'a>(cx: Scope<'a>, post_id: PostId, content: &'a EndpointPoll) -> El
 
         let foreground_styles = maybe_class!("font-bold", leader_ids.contains(&choice.id));
 
-        rsx! { "todo" }
+        rsx! { 
+            li {
+                key: "{choice.id.to_string()}",
+                class: "relative p-2 m-2 cursor-pointer grid grid-cols-[3rem_1fr] border rounded border-slate-400",
+                onclick: move |_| (),
+                div {
+                    class: "absolute left-0 {background_color} h-full rounded z-[-1]",
+                    style: "width: {percent}",
+                },
+                div {
+                    class: "{foreground_styles}",
+                    "{percent}",
+                },
+                div {
+                    class: "{foreground_styles}",
+                    "{choice.description.as_ref()}",
+                }
+            }
+        }
     });
 
-    todo!()
+    let Headline = rsx! { figcaption { "{content.headline.as_ref()}"}};
+
+    cx.render(rsx! {
+        div {
+            Headline,
+            ul {
+                Choices.into_iter()
+            }
+        }
+    })
 }
 
 #[inline_props]
