@@ -88,6 +88,8 @@ diesel::table! {
 
 diesel::joinable!(followers -> users (follows));
 diesel::joinable!(poll_votes -> poll_choices (choice_id));
+diesel::joinable!(bookmarks -> posts (post_id));
+diesel::joinable!(reactions -> posts (post_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     bookmarks,
