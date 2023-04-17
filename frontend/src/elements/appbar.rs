@@ -4,6 +4,49 @@ use crate::prelude::*;
 use dioxus::prelude::*;
 
 #[derive(Props)]
+pub struct AppbarImgButtonProps<'a, F>
+where
+    F: Fn(Event<MouseData>),
+{
+    append_class: Option<&'a str>,
+    click_handler: Option<F>,
+    disabled: Option<bool>,
+    img: &'a str,
+    label: &'a str,
+    title: Option<&'a str>,
+}
+
+pub fn AppbarImgButton<'a, F>(cx: Scope<'a, AppbarImgButtonProps<'a, F>>) -> Element
+where
+    F: Fn(Event<MouseData>),
+{
+    let append_class = cx.props.append_class.unwrap_or("");
+
+    cx.render(rsx! {
+        button {
+            class: "flex flex-col w-10 h-14
+                justify-end items-center border-slate-200
+                border-b-4 {append_class}",
+            disabled: cx.props.disabled.unwrap_or_default(),
+            onclick: |ev| {
+                if let Some(callback) = &cx.props.click_handler {
+                    callback(ev);
+                }
+            },
+            title: cx.props.title,
+            img {
+                class: "w-6 h-6",
+                src: "{cx.props.img}",
+            },
+            span {
+                class: "text-sm",
+                "{cx.props.label}",
+            }
+        }
+    })
+}
+
+#[derive(Props)]
 pub struct AppbarProps<'a> {
     title: &'a str,
     children: Element<'a>,
