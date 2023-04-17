@@ -57,3 +57,6 @@ route!("/post/boost" => post::endpoint::Boost);
 route!("/post/vote" => post::endpoint::Vote);
 route!("/post/react" => post::endpoint::React);
 route!("/posts/trending" => post::endpoint::TrendingPosts);
+route!("/posts/home" => post::endpoint::HomePosts);
+route!("/posts/liked" => post::endpoint::LikedPosts);
+route!("/posts/bookmarked" => post::endpoint::BookmarkedPosts);

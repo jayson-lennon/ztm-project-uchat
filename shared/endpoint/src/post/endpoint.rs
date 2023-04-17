@@ -71,3 +71,27 @@ pub struct Vote {
 pub struct VoteOk {
     pub cast: VoteCast,
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct HomePosts;
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct HomePostsOk {
+    pub posts: Vec<PublicPost>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct LikedPosts;
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct LikedPostsOk {
+    pub posts: Vec<PublicPost>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct BookmarkedPosts;
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub struct BookmarkedPostsOk {
+    pub posts: Vec<PublicPost>,
+}
