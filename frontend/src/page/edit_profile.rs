@@ -91,6 +91,55 @@ pub fn ImagePreview(cx: Scope, page_state: UseRef<PageState>) -> Element {
 }
 
 #[inline_props]
+pub fn DisplayNameInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
+    use uchat_domain::user::DisplayName;
+
+    let max_chars = DisplayName::MAX_CHARS;
+
+    let wrong_len = maybe_class!(
+        "err-text-color",
+        page_state.read().display_name.len() > max_chars
+    );
+
+
+    cx.render(rsx! {
+        div {
+            label {
+                r#for: "display-name",
+                div {
+                    class: "flex flex-row justify-between",
+                    span { "Display Name" },
+                    span {
+                        class: "text-right {wrong_len}",
+                        "{page_state.read().display_name.len()}/{max_chars}",
+                    }
+ 
+                }
+            },
+            input {
+                id: "display-name",
+                class: "input-field",
+                placeholder: "Display Name",
+                value: "{page_state.read().display_name}",
+                oninput: move |ev| {
+                    match DisplayName::new(&ev.value) {
+                        Ok(_) => {
+                            page_state.with_mut(|state| state.form_errors.remove("bad-displayname"));
+                        }
+                        Err(e) => {
+                            page_state.with_mut(|state| state.form_errors.set("bad-displayname", e.formatted_error()));
+                        }
+                    }
+                    page_state.with_mut(|state| state.display_name = ev.value.clone());
+                }
+            }
+        }
+    })
+}
+
+
+
+#[inline_props]
 pub fn EmailInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
     use uchat_domain::user::Email;
 
@@ -135,6 +184,7 @@ pub fn EditProfile(cx: Scope) -> Element {
 
             ImagePreview { page_state: page_state.clone() },
             ImageInput { page_state: page_state.clone() },
+            DisplayNameInput { page_state: page_state.clone() },
             EmailInput { page_state: page_state.clone() },
 
             KeyedNotificationBox { notifications: page_state.clone().read().form_errors.clone() },
