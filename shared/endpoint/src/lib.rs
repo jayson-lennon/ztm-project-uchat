@@ -60,3 +60,28 @@ route!("/posts/trending" => post::endpoint::TrendingPosts);
 route!("/posts/home" => post::endpoint::HomePosts);
 route!("/posts/liked" => post::endpoint::LikedPosts);
 route!("/posts/bookmarked" => post::endpoint::BookmarkedPosts);
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub enum Update<T> {
+    Change(T),
+    NoChange,
+    SetNull,
+}
+
+impl<T> Update<T> {
+    pub fn into_option(self) -> Option<T> {
+        match self {
+            Self::Change(data) => Some(data),
+            Self::NoChange => None,
+            Self::SetNull => None,
+        }
+    }
+
+    pub fn into_nullable(self) -> Option<Option<T>> {
+        match self {
+            Self::Change(data) => Some(Some(data)),
+            Self::NoChange => None,
+            Self::SetNull => Some(None),
+        }
+    }
+}

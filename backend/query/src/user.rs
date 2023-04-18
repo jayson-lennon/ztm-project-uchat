@@ -5,6 +5,7 @@ use diesel::PgConnection;
 use password_hash::PasswordHashString;
 use uchat_domain::ids::UserId;
 use uchat_domain::Username;
+use uchat_endpoint::Update;
 
 use crate::{DieselError, QueryError};
 
@@ -59,4 +60,22 @@ pub fn get(conn: &mut PgConnection, user_id: UserId) -> Result<User, DieselError
 pub fn find(conn: &mut PgConnection, username: &Username) -> Result<User, DieselError> {
     use crate::schema::users::dsl::*;
     users.filter(handle.eq(username.as_ref())).get_result(conn)
+}
+
+#[derive(Debug)]
+pub struct UpdateProfileParams {
+    pub id: UserId,
+    pub display_name: Update<String>,
+    pub email: Update<String>,
+    pub password_hash: Update<PasswordHashString>,
+    pub profile_image: Update<String>,
+}
+
+#[derive(AsChangeset, Debug)]
+#[diesel(table_name = crate::schema::users)]
+struct UpdateProfileParamsInternal {
+    pub display_name: Option<Option<String>>,
+    pub email: Option<Option<String>>,
+    pub password_hash: Option<String>,
+    pub profile_image: Option<Option<String>>,
 }
