@@ -45,4 +45,8 @@
   .profile-portrait {
     @apply object-cover rounded-md w-14 h-14;
   }
+
+  .profile-portrait-lg {
+    @apply object-cover rounded-md w-28 h-28;
+  }
 }
