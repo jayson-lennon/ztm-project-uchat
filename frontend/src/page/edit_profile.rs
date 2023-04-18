@@ -136,7 +136,75 @@ pub fn DisplayNameInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
         }
     })
 }
+#[inline_props]
+pub fn PasswordInput(cx: Scope, state: UseRef<PageState>) -> Element {
+    use uchat_domain::user::Password;
 
+    let check_password_mismatch = move || {
+        let password_matches = state.with(|state| state.password == state.password_confirmation);
+        match password_matches {
+            true => state.with_mut(|state| state.form_errors.remove("password-mismatch")),
+            false => state.with_mut(|state| state.form_errors.set("password-mismatch", "Passwords must match")),
+        }
+    };
+
+    cx.render(rsx!{
+        fieldset {
+            class: "fieldset",
+            legend { "Set new password" },
+            div {
+                class: "flex flex-row w-full gap-2",
+                div {
+                    label {
+                        r#for: "password",
+                        "Password"
+                    },
+                    input {
+                        id: "password",
+                        class: "input-field",
+                        r#type: "password",
+                        placeholder: "Password",
+                        value: "{state.read().password}",
+                        oninput: move |ev| {
+                            match Password::new(&ev.value) {
+                                Ok(_) => state.with_mut(|state| state.form_errors.remove("bad-password")),
+                                Err(e) => state.with_mut(|state| state.form_errors.set("bad-password", e.formatted_error())),
+                            }
+                            state.with_mut(|state| state.password = ev.value.clone());
+                            state.with_mut(|state| state.password_confirmation = "".to_string());
+
+                            if state.with(|state| state.password.is_empty()) {
+                                state.with_mut(|state| state.form_errors.remove("bad-password"));
+                                state.with_mut(|state| state.form_errors.remove("password-mismatch"));
+                            } else {
+                                check_password_mismatch();
+                            }
+                        }
+                    }
+                }
+                div {
+                    label {
+                        r#for: "password-confirm",
+                        "Confirm"
+                    },
+                    input {
+                        id: "password-confirm",
+                        class: "input-field",
+                        r#type: "password",
+                        placeholder: "Confirm",
+                        value: "{state.read().password_confirmation}",
+                        oninput: move |ev| {
+                            state.with_mut(|state| state.password_confirmation = ev.value.clone());
+                            check_password_mismatch();
+                        }
+ 
+                }
+            }
+        }
+    }
+    })
+}
+ 
 
 
 #[inline_props]
@@ -186,6 +254,7 @@ pub fn EditProfile(cx: Scope) -> Element {
             ImageInput { page_state: page_state.clone() },
             DisplayNameInput { page_state: page_state.clone() },
             EmailInput { page_state: page_state.clone() },
+            PasswordInput { state: page_state.clone() },
 
             KeyedNotificationBox { notifications: page_state.clone().read().form_errors.clone() },
 
