@@ -1,7 +1,12 @@
 #![allow(non_snake_case)]
 
-use crate::{elements::keyed_notification_box::KeyedNotifications, prelude::*, util};
+use crate::{
+    elements::{keyed_notification_box::KeyedNotifications, KeyedNotificationBox},
+    prelude::*,
+    util,
+};
 use dioxus::prelude::*;
+use uchat_domain::UserFacingError;
 use web_sys::HtmlInputElement;
 
 #[derive(Clone, Debug)]
@@ -85,6 +90,40 @@ pub fn ImagePreview(cx: Scope, page_state: UseRef<PageState>) -> Element {
     })
 }
 
+#[inline_props]
+pub fn EmailInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
+    use uchat_domain::user::Email;
+
+    cx.render(rsx! {
+        div {
+            label {
+                r#for: "email",
+                div {
+                    class: "flex flex-row justify-between",
+                    span { "Email Address" },
+                }
+            },
+            input {
+                class: "input-field",
+                id: "email",
+                placeholder: "Email Address",
+                value: "{page_state.read().email}",
+                oninput: move |ev| {
+                    match Email::new(&ev.value) {
+                        Ok(_) => {
+                            page_state.with_mut(|state| state.form_errors.remove("bad-email"));
+                        }
+                        Err(e) => {
+                            page_state.with_mut(|state| state.form_errors.set("bad-email", e.formatted_error()));
+                        }
+                    }
+                    page_state.with_mut(|state| state.email = ev.value.clone());
+                }
+            }
+        }
+    })
+}
+
 pub fn EditProfile(cx: Scope) -> Element {
     let page_state = use_ref(cx, PageState::default);
     let router = use_router(cx);
@@ -96,6 +135,9 @@ pub fn EditProfile(cx: Scope) -> Element {
 
             ImagePreview { page_state: page_state.clone() },
             ImageInput { page_state: page_state.clone() },
+            EmailInput { page_state: page_state.clone() },
+
+            KeyedNotificationBox { notifications: page_state.clone().read().form_errors.clone() },
 
             div {
                 class: "flex flex-row justify-end gap-3",
