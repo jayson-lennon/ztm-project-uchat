@@ -246,8 +246,67 @@ pub fn EmailInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
 }
 
 pub fn EditProfile(cx: Scope) -> Element {
+    let api_client = ApiClient::global();
     let page_state = use_ref(cx, PageState::default);
     let router = use_router(cx);
+    let toaster = use_toaster(cx);
+
+    let form_onsubmit =
+        async_handler!(&cx, [api_client, page_state, router, toaster], move |_| async move {
+            use uchat_endpoint::user::endpoint::{UpdateProfile, UpdateProfileOk};
+            use uchat_endpoint::Update;
+
+            let request_data = {
+                use uchat_domain::{Password};
+                UpdateProfile {
+                    display_name: {
+                        let name = page_state.with(|state| state.display_name.clone());
+                        if name.is_empty() {
+                            Update::SetNull
+                        } else {
+                            Update::Change(name)
+                        }
+                    },
+                    email: {
+                        let email = page_state.with(|state| state.email.clone());
+                        if email.is_empty() {
+                            Update::SetNull
+                        } else {
+                            Update::Change(email)
+                        }
+                    },
+                    password: {
+                        let password = page_state.with(|state| state.password.clone());
+                        if password.is_empty() {
+                            Update::NoChange
+                        } else {
+                            Update::Change(Password::new(password).unwrap())
+                        }
+                    },
+                    profile_image: {
+                        let profile_image = page_state.with(|state| state.profile_image.clone());
+                        match profile_image {
+                            Some(PreviewImageData::DataUrl(data)) => Update::Change(data),
+                            Some(PreviewImageData::Remote(_)) => Update::NoChange,
+                            None => Update::SetNull,
+                        }
+                    },
+                }
+            };
+
+            let response = fetch_json!(<UpdateProfileOk>, api_client, request_data);
+            match response {
+                Ok(res) => {
+                    toaster.write().success("Profile updated", chrono::Duration::seconds(3));
+                    router.navigate_to(crate::page::HOME)
+                }
+                Err(e) => {
+                    toaster.write().error(format!("Failed to update profile: {}", e), chrono::Duration::seconds(3));
+                }
+            }
+        });
+
+
 
     let disable_submit = page_state.with(|state| state.form_errors.has_messages());
     let submit_btn_style = maybe_class!("btn-disabled", disable_submit);
