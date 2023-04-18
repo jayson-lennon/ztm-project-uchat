@@ -79,3 +79,26 @@ struct UpdateProfileParamsInternal {
     pub password_hash: Option<String>,
     pub profile_image: Option<Option<String>>,
 }
+
+pub fn update_profile(
+    conn: &mut PgConnection,
+    query_params: UpdateProfileParams,
+) -> Result<(), DieselError> {
+    use crate::schema::users;
+
+    let update = UpdateProfileParamsInternal {
+        display_name: query_params.display_name.into_nullable(),
+        email: query_params.email.into_nullable(),
+        password_hash: query_params
+            .password_hash
+            .into_option()
+            .map(|s| s.to_string()),
+        profile_image: query_params.profile_image.into_nullable(),
+    };
+
+    diesel::update(users::table)
+        .filter(users::id.eq(&query_params.id))
+        .set(&update)
+        .execute(conn)
+        .map(|_| ())
+}
