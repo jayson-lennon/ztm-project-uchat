@@ -226,13 +226,17 @@ pub fn EmailInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
                 placeholder: "Email Address",
                 value: "{page_state.read().email}",
                 oninput: move |ev| {
-                    match Email::new(&ev.value) {
-                        Ok(_) => {
-                            page_state.with_mut(|state| state.form_errors.remove("bad-email"));
+                    if !&ev.value.is_empty() {
+                        match Email::new(&ev.value) {
+                            Ok(_) => {
+                                page_state.with_mut(|state| state.form_errors.remove("bad-email"));
+                            }
+                            Err(e) => {
+                                page_state.with_mut(|state| state.form_errors.set("bad-email", e.formatted_error()));
+                            }
                         }
-                        Err(e) => {
-                            page_state.with_mut(|state| state.form_errors.set("bad-email", e.formatted_error()));
-                        }
+                    } else {
+                        page_state.with_mut(|state| state.form_errors.remove("bad-email"));
                     }
                     page_state.with_mut(|state| state.email = ev.value.clone());
                 }
@@ -244,6 +248,9 @@ pub fn EmailInput(cx: Scope, page_state: UseRef<PageState>) -> Element {
 pub fn EditProfile(cx: Scope) -> Element {
     let page_state = use_ref(cx, PageState::default);
     let router = use_router(cx);
+
+    let disable_submit = page_state.with(|state| state.form_errors.has_messages());
+    let submit_btn_style = maybe_class!("btn-disabled", disable_submit);
 
     cx.render(rsx! {
         form {
@@ -267,8 +274,9 @@ pub fn EditProfile(cx: Scope) -> Element {
                     "Cancel"
                 },
                 button {
-                    class: "btn",
+                    class: "btn {submit_btn_style}",
                     r#type: "submit",
+                    disabled: disable_submit,
                     "Submit"
                 },
             }
