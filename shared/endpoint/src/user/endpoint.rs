@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use uchat_domain::{ids::*, Password, Username};
 use url::Url;
 
-use crate::{Endpoint, Update};
+use crate::{post::types::PublicPost, Endpoint, Update};
+
+use super::types::PublicUserProfile;
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct CreateUser {
@@ -61,4 +63,15 @@ pub struct UpdateProfile {
 #[derive(Clone, Deserialize, Serialize)]
 pub struct UpdateProfileOk {
     pub profile_image: Option<Url>,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct ViewProfile {
+    pub for_user: UserId,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct ViewProfileOk {
+    pub profile: PublicUserProfile,
+    pub posts: Vec<PublicPost>,
 }

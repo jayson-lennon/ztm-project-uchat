@@ -51,6 +51,7 @@ pub fn new_router(state: AppState) -> axum::Router {
         .route(LikedPosts::URL, post(with_handler::<LikedPosts>))
         .route(GetMyProfile::URL, post(with_handler::<GetMyProfile>))
         .route(UpdateProfile::URL, post(with_handler::<UpdateProfile>))
+        .route(ViewProfile::URL, post(with_handler::<ViewProfile>))
         .route(BookmarkedPosts::URL, post(with_handler::<BookmarkedPosts>))
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(8 * 1024 * 1024));

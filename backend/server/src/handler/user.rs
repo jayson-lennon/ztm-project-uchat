@@ -7,7 +7,7 @@ use uchat_endpoint::{
     user::{
         endpoint::{
             CreateUser, CreateUserOk, GetMyProfile, GetMyProfileOk, Login, LoginOk, UpdateProfile,
-            UpdateProfileOk,
+            UpdateProfileOk, ViewProfile, ViewProfileOk,
         },
         types::PublicUserProfile,
     },
@@ -202,5 +202,33 @@ impl AuthorizedApiRequest for UpdateProfile {
                 profile_image: profile_image_url,
             }),
         ))
+    }
+}
+
+#[async_trait]
+impl AuthorizedApiRequest for ViewProfile {
+    type Response = (StatusCode, Json<ViewProfileOk>);
+    async fn process_request(
+        self,
+        DbConnection(mut conn): DbConnection,
+        session: UserSession,
+        state: AppState,
+    ) -> ApiResult<Self::Response> {
+        let profile = uchat_query::user::get(&mut conn, self.for_user)?;
+        let profile = to_public(profile)?;
+
+        let mut posts = vec![];
+
+        for post in uchat_query::post::get_public_posts(&mut conn, self.for_user)? {
+            let post_id = post.id;
+            match super::post::to_public(&mut conn, post, Some(&session)) {
+                Ok(post) => posts.push(post),
+                Err(e) => {
+                    tracing::error!(err = %e.err, post_id = ?post_id, "post contains invalid data");
+                }
+            }
+        }
+
+        Ok((StatusCode::OK, Json(ViewProfileOk { profile, posts })))
     }
 }
