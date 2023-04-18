@@ -338,6 +338,15 @@ pub fn EditProfile(cx: Scope) -> Element {
     let submit_btn_style = maybe_class!("btn-disabled", disable_submit);
 
     cx.render(rsx! {
+        Appbar {
+            title: "Edit Profile",
+            AppbarImgButton {
+                click_handler: move |_| router.pop_route(),
+                img: "/static/icons/icon-back.svg",
+                label: "Back",
+                title: "Go to the previous page",
+            }
+        },
         form {
             class: "flex flex-col w-full gap-3",
             onsubmit: form_onsubmit,
