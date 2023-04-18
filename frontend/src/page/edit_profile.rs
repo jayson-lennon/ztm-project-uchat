@@ -251,6 +251,32 @@ pub fn EditProfile(cx: Scope) -> Element {
     let router = use_router(cx);
     let toaster = use_toaster(cx);
 
+    let _fetch_profile = {
+        to_owned![api_client, toaster, page_state];
+        use_future(cx, (), |_| async move {
+            use uchat_endpoint::user::endpoint::{GetMyProfile, GetMyProfileOk};
+            toaster
+                .write()
+                .info("Retrieving profile ...", chrono::Duration::seconds(3));
+            let response = fetch_json!(<GetMyProfileOk>, api_client, GetMyProfile);
+            match response {
+                Ok(res) => {
+                    page_state.with_mut(|state| {
+                        state.display_name = res.display_name.unwrap_or_default();
+                        state.email = res.email.unwrap_or_default();
+                        state.profile_image = res.profile_image.map(|img| PreviewImageData::Remote(img.to_string()));
+                    });
+                }
+                Err(e) => toaster.write().error(
+                    format!("Failed to retrieve profile: {e}"),
+                    chrono::Duration::seconds(3),
+                ),
+            }
+        })
+    };
+
+
+
     let form_onsubmit =
         async_handler!(&cx, [api_client, page_state, router, toaster], move |_| async move {
             use uchat_endpoint::user::endpoint::{UpdateProfile, UpdateProfileOk};
@@ -314,6 +340,7 @@ pub fn EditProfile(cx: Scope) -> Element {
     cx.render(rsx! {
         form {
             class: "flex flex-col w-full gap-3",
+            onsubmit: form_onsubmit,
             prevent_default: "onsubmit",
 
             ImagePreview { page_state: page_state.clone() },
