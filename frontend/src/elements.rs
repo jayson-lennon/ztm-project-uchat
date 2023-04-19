@@ -1,5 +1,6 @@
 pub mod appbar;
 pub mod keyed_notification_box;
+pub mod local_profile;
 pub mod navbar;
 pub mod post;
 pub mod toaster;

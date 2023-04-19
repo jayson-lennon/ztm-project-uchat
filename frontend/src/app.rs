@@ -13,6 +13,36 @@ pub use crate::prelude::*;
 
 pub static TOASTER: AtomRef<Toaster> = |_| Toaster::default();
 pub static POSTMANAGER: AtomRef<PostManager> = |_| PostManager::default();
+pub static LOCAL_PROFILE: AtomRef<LocalProfile> = |_| LocalProfile::default();
+
+pub fn Init(cx: Scope) -> Element {
+    let api_client = ApiClient::global();
+    let router = use_router(cx);
+    let toaster = use_toaster(cx);
+    let local_profile = use_local_profile(cx);
+
+    let _fetch_local_profile = {
+        to_owned![api_client, toaster, router, local_profile];
+        use_future(cx, (), |_| async move {
+            use uchat_endpoint::user::endpoint::{GetMyProfile, GetMyProfileOk};
+            let response = fetch_json!(<GetMyProfileOk>, api_client, GetMyProfile);
+            match response {
+                Ok(res) => {
+                    local_profile.write().image = res.profile_image;
+                    local_profile.write().user_id = Some(res.user_id);
+                }
+                Err(e) => {
+                    toaster.write().error(
+                        "Please log in or create an account to continue.",
+                        chrono::Duration::seconds(5),
+                    );
+                    router.navigate_to(page::ACCOUNT_LOGIN)
+                }
+            }
+        })
+    };
+    None
+}
 
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
@@ -23,6 +53,7 @@ pub fn App(cx: Scope) -> Element {
 
     cx.render(rsx! {
         Router {
+            Init {},
             main {
                 class: "max-w-[var(--content-max-width)]
                 min-w-[var(--content-min-width)]
