@@ -22,11 +22,40 @@ impl SidebarManager {
         self.is_open = false;
     }
 
-    pub fn is_open(&mut self) -> bool {
+    pub fn is_open(&self) -> bool {
         self.is_open
     }
 }
 
 pub fn Sidebar(cx: Scope) -> Element {
-    cx.render(rsx! {"sidebar"})
+    let sidebar = use_sidebar(cx);
+
+    let sidebar_width = if sidebar.read().is_open() {
+        "w-[var(--sidebar-width)]"
+    } else {
+        "w-0"
+    };
+
+    let overlay_class = if sidebar.read().is_open() {
+        "w-full opacity-80"
+    } else {
+        "w-0 opacity-0"
+    };
+
+    let Overlay = rsx! {
+        div {
+            class: "fixed top-0 left-0 h-full navbar-bg-color transition z-[99] {overlay_class}",
+            onclick: move |_| sidebar.write().close(),
+        }
+    };
+
+    cx.render(rsx! {
+        Overlay,
+        div {
+            class: "{sidebar_width} z-[100] fixed top-0 left-0 h-full
+            overflow-x-hidden
+            flex flex-col
+            navbar-bg-color transition-[width] duration-300"
+        }
+    })
 }

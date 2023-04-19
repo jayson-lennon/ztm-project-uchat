@@ -56,6 +56,7 @@ pub struct AppbarProps<'a> {
 
 pub fn Appbar<'a>(cx: Scope<'a, AppbarProps<'a>>) -> Element {
     let local_profile = use_local_profile(cx);
+    let sidebar = use_sidebar(cx);
 
     let local_profile = local_profile.read();
     let profile_img_src = local_profile
@@ -73,7 +74,7 @@ pub fn Appbar<'a>(cx: Scope<'a, AppbarProps<'a>>) -> Element {
                 class: "flex flex-row gap-8 items-center w-full pr-5 h-full",
                 div {
                     class: "cursor-pointer",
-                    onclick: move |_| (),
+                    onclick: move |_| sidebar.write().open(),
                     img {
                         class: "profile-portrait",
                         src: "{profile_img_src}"

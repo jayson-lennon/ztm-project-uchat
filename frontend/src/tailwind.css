@@ -7,6 +7,7 @@
   --navbar-height: 3.8rem;
   --content-min-width: 300px;
   --content-max-width: 576px;
+  --sidebar-width: 250px;
 }
 
 @layer components {
