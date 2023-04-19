@@ -19,7 +19,7 @@ use uchat_endpoint::{
         Bookmark, BookmarkedPosts, Boost, HomePosts, LikedPosts, NewPost, React, TrendingPosts,
         Vote,
     },
-    user::endpoint::{CreateUser, GetMyProfile, Login, UpdateProfile},
+    user::endpoint::{CreateUser, GetMyProfile, Login, UpdateProfile, ViewProfile},
     Endpoint,
 };
 

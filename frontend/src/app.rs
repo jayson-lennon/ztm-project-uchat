@@ -40,6 +40,7 @@ pub fn App(cx: Scope) -> Element {
                 Route { to: page::POST_NEW_POLL, page::NewPoll {} },
                 Route { to: page::POSTS_TRENDING, page::Trending {} },
                 Route { to: page::PROFILE_EDIT, page::EditProfile {} },
+                Route { to: page::PROFILE_VIEW, page::ViewProfile {} },
             }
 
             ToastRoot { toaster: toaster },
