@@ -47,7 +47,7 @@ pub fn to_public(user: User) -> ApiResult<PublicUserProfile> {
             .display_name
             .and_then(|name| DisplayName::new(name).ok()),
         handle: user.handle,
-        profile_image: None,
+        profile_image: user.profile_image.as_ref().map(|id| profile_id_to_url(id)),
         created_at: user.created_at,
         am_following: false,
     })
