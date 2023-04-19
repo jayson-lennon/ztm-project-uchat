@@ -6,10 +6,10 @@ use uchat_domain::{ids::*, user::DisplayName};
 use uchat_endpoint::{
     user::{
         endpoint::{
-            CreateUser, CreateUserOk, GetMyProfile, GetMyProfileOk, Login, LoginOk, UpdateProfile,
-            UpdateProfileOk, ViewProfile, ViewProfileOk,
+            CreateUser, CreateUserOk, FollowUser, FollowUserOk, GetMyProfile, GetMyProfileOk,
+            Login, LoginOk, UpdateProfile, UpdateProfileOk, ViewProfile, ViewProfileOk,
         },
-        types::PublicUserProfile,
+        types::{FollowAction, PublicUserProfile},
     },
     Update,
 };
@@ -230,5 +230,32 @@ impl AuthorizedApiRequest for ViewProfile {
         }
 
         Ok((StatusCode::OK, Json(ViewProfileOk { profile, posts })))
+    }
+}
+
+#[async_trait]
+impl AuthorizedApiRequest for FollowUser {
+    type Response = (StatusCode, Json<FollowUserOk>);
+    async fn process_request(
+        self,
+        DbConnection(mut conn): DbConnection,
+        session: UserSession,
+        state: AppState,
+    ) -> ApiResult<Self::Response> {
+        match self.action {
+            FollowAction::Follow => {
+                uchat_query::user::follow(&mut conn, session.user_id, self.user_id)?;
+            }
+            FollowAction::Unfollow => {
+                uchat_query::user::unfollow(&mut conn, session.user_id, self.user_id)?;
+            }
+        }
+
+        Ok((
+            StatusCode::OK,
+            Json(FollowUserOk {
+                status: self.action,
+            }),
+        ))
     }
 }

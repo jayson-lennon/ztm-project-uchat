@@ -7,6 +7,7 @@ use uchat_domain::ids::UserId;
 use uchat_domain::Username;
 use uchat_endpoint::Update;
 
+use crate::post::DeleteStatus;
 use crate::{DieselError, QueryError};
 
 pub fn new<T: AsRef<str>>(
@@ -101,4 +102,41 @@ pub fn update_profile(
         .set(&update)
         .execute(conn)
         .map(|_| ())
+}
+
+pub fn follow(conn: &mut PgConnection, user_id: UserId, follow: UserId) -> Result<(), DieselError> {
+    let uid = user_id;
+    let fid = follow;
+    {
+        use crate::schema::followers::dsl::*;
+        diesel::insert_into(followers)
+            .values((user_id.eq(uid), follows.eq(fid)))
+            .on_conflict((user_id, follows))
+            .do_nothing()
+            .execute(conn)
+            .map(|_| ())
+    }
+}
+
+pub fn unfollow(
+    conn: &mut PgConnection,
+    user_id: UserId,
+    stop_following: UserId,
+) -> Result<DeleteStatus, DieselError> {
+    let uid = user_id;
+    let fid = stop_following;
+    {
+        use crate::schema::followers::dsl::*;
+        diesel::delete(followers)
+            .filter(user_id.eq(uid))
+            .filter(follows.eq(fid))
+            .execute(conn)
+            .map(|rowcount| {
+                if rowcount > 0 {
+                    DeleteStatus::Deleted
+                } else {
+                    DeleteStatus::NotFound
+                }
+            })
+    }
 }

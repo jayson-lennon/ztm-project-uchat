@@ -12,3 +12,9 @@ pub struct PublicUserProfile {
     pub created_at: DateTime<Utc>,
     pub am_following: bool,
 }
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+pub enum FollowAction {
+    Follow,
+    Unfollow,
+}
