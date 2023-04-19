@@ -39,5 +39,67 @@ pub fn ViewProfile(cx: Scope) -> Element {
         }
     });
 
-    cx.render(rsx! {""})
+    let ProfileSection = {
+        match profile.with(|profile| profile.clone()) {
+            Some(profile) => {
+                let display_name = profile
+                    .display_name
+                    .map(|name| name.into_inner())
+                    .unwrap_or_else(|| "(None)".to_string());
+                let profile_image = profile
+                    .profile_image
+                    .map(|url| url.to_string())
+                    .unwrap_or_else(|| "".to_string());
+
+                let follow_button_text = match profile.am_following {
+                    true => "Unfollow",
+                    false => "Follow",
+                };
+
+                rsx! {
+                    div {
+                        class: "flex flex-col gap-3",
+                        div {
+                            class: "flex flex-row justify-center",
+                            img {
+                                class: "profile-portrait-lg",
+                                src: "{profile_image}",
+                            }
+                        },
+                        div { "Handle: {profile.handle}" },
+                        div { "Name: {display_name} "},
+                        button {
+                            class: "btn",
+                            onclick: move |_| (),
+                            "{follow_button_text}"
+                        }
+                    }
+                }
+            }
+            None => rsx! { "Loading profile..." },
+        }
+    };
+
+    let Posts = post_manager.read().all_to_public();
+
+    cx.render(rsx! {
+        Appbar {
+            title: "View Profile",
+            AppbarImgButton {
+                click_handler: move |_| router.pop_route(),
+                img: "/static/icons/icon-back.svg",
+                label: "Back",
+                title: "Go to the previous page",
+            }
+        },
+        ProfileSection,
+        div {
+            class: "font-bold text-center my-6",
+            "Posts"
+        },
+        hr {
+            class: "h-px my-6 bg-gray-200 border-0",
+        },
+        Posts.into_iter()
+    })
 }
