@@ -128,6 +128,8 @@ impl PublicApiRequest for Login {
 
         let (session, signature, duration) = new_session(&state, &mut conn, user.id)?;
 
+        let profile_image_url = user.profile_image.as_ref().map(|id| profile_id_to_url(id));
+
         Ok((
             StatusCode::OK,
             Json(LoginOk {
@@ -136,7 +138,7 @@ impl PublicApiRequest for Login {
                 session_signature: signature.0,
                 display_name: user.display_name,
                 email: user.email,
-                profile_image: None,
+                profile_image: profile_image_url,
                 user_id: user.id,
             }),
         ))
