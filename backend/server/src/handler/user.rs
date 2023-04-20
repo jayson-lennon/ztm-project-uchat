@@ -21,7 +21,7 @@ use uchat_query::{
 use url::Url;
 
 use crate::{
-    error::{ApiError, ApiResult},
+    error::{ApiError, ApiResult, ServerError},
     extractor::{DbConnection, UserSession},
     AppState,
 };
@@ -89,7 +89,8 @@ impl PublicApiRequest for CreateUser {
         state: AppState,
     ) -> ApiResult<Self::Response> {
         let password_hash = uchat_crypto::hash_password(&self.password)?;
-        let user_id = uchat_query::user::new(&mut conn, password_hash, &self.username)?;
+        let user_id = uchat_query::user::new(&mut conn, password_hash, &self.username)
+            .map_err(|_| ServerError::account_exists())?;
 
         info!(username = self.username.as_ref(), "new user created");
 
@@ -119,12 +120,18 @@ impl PublicApiRequest for Login {
         let _span = tracing::span!(tracing::Level::INFO, "logging in",
                 user = %self.username.as_ref())
         .entered();
-        let hash = uchat_query::user::get_password_hash(&mut conn, &self.username)?;
-        let hash = uchat_crypto::password::deserialize_hash(&hash)?;
 
-        uchat_crypto::verify_password(self.password, &hash)?;
+        let hash = uchat_query::user::get_password_hash(&mut conn, &self.username)
+            .map_err(|_| ServerError::wrong_password())?;
 
-        let user = uchat_query::user::find(&mut conn, &self.username)?;
+        let hash = uchat_crypto::password::deserialize_hash(&hash)
+            .map_err(|_| ServerError::wrong_password())?;
+
+        uchat_crypto::verify_password(self.password, &hash)
+            .map_err(|_| ServerError::wrong_password())?;
+
+        let user = uchat_query::user::find(&mut conn, &self.username)
+            .map_err(|_| ServerError::missing_login())?;
 
         let (session, signature, duration) = new_session(&state, &mut conn, user.id)?;
 
