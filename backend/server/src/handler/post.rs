@@ -67,7 +67,7 @@ pub fn to_public(
             id: post.id,
             by_user: {
                 let profile = query_user::get(conn, post.user_id)?;
-                super::user::to_public(profile)?
+                super::user::to_public(conn, session, profile)?
             },
             content,
             time_posted: post.time_posted,
