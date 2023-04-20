@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
+use dioxus_router::Link;
 use uchat_domain::UserFacingError;
 
 use crate::{
@@ -82,6 +83,16 @@ pub fn UsernameInput<'a>(
     })
 }
 
+pub fn LoginLink(cx: Scope) -> Element {
+    cx.render(rsx! {
+        Link {
+            class: "link text-center",
+            to: page::ACCOUNT_LOGIN,
+            "Existing User Login"
+        }
+    })
+}
+
 pub fn Register(cx: Scope) -> Element {
     let api_client = ApiClient::global();
     let page_state = PageState::new(cx);
@@ -159,7 +170,7 @@ pub fn Register(cx: Scope) -> Element {
                 state: page_state.with(|state| state.password.clone()),
                 oninput: password_oninput,
             },
-
+            LoginLink {},
             KeyedNotificationBox {
                 legend: "Form Errors",
                 notifications: page_state.clone().with(|state| state.form_errors.clone()),
