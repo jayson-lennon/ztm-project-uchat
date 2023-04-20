@@ -22,9 +22,9 @@ pub fn ViewProfile(cx: Scope) -> Element {
     use_effect(cx, (&user_id,), |(user_id,)| {
         to_owned![api_client, post_manager, profile, toaster];
         async move {
-            post_manager.write().clear();
             use uchat_endpoint::user::endpoint::{ViewProfile, ViewProfileOk};
             let request = ViewProfile { for_user: user_id };
+            post_manager.write().clear();
             let response = fetch_json!(<ViewProfileOk>, api_client, request);
             match response {
                 Ok(res) => {
