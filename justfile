@@ -17,8 +17,8 @@ clippy:
 
 # run clippy fix
 fix:
-    cargo clippy -p frontend --fix --target wasm32-unknown-unknown --allow-dirty
-    cargo clippy --workspace --fix --exclude frontend --allow-dirty
+    cargo clippy -p frontend --fix --target wasm32-unknown-unknown
+    cargo clippy --workspace --fix --exclude frontend
 
 # build docs. use --open to open in browser
 doc *ARGS:
