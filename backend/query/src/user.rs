@@ -164,3 +164,22 @@ pub fn is_following(
             })
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use crate::test_db::Result;
+
+    pub mod util {
+        use diesel::PgConnection;
+
+        use crate::user::User;
+
+        pub fn new_user(conn: &mut PgConnection, handle: &str) -> User {
+            use crate::user as user_query;
+
+            let hash = uchat_crypto::hash_password("password").unwrap();
+            let id = user_query::new(conn, hash, handle).unwrap();
+            user_query::get(conn, id).unwrap()
+        }
+    }
+}
