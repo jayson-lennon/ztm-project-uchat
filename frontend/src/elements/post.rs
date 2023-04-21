@@ -147,10 +147,10 @@ pub fn Header<'a>(cx: Scope<'a>, post: &'a PublicPost) -> Element {
 #[inline_props]
 pub fn PublicPostEntry(cx: Scope, post_id: PostId) -> Element {
     let post_manager = use_post_manager(cx);
-    let router = use_router(cx);
+    let _router = use_router(cx);
 
     let this_post = {
-        let post = post_manager.read().get(&post_id).unwrap().clone();
+        let post = post_manager.read().get(post_id).unwrap().clone();
         use_state(cx, || post)
     };
 

@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{fetch_json, prelude::*, util};
+use crate::{fetch_json, prelude::*};
 use chrono::Duration;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};

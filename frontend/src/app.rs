@@ -32,7 +32,7 @@ pub fn Init(cx: Scope) -> Element {
                     local_profile.write().image = res.profile_image;
                     local_profile.write().user_id = Some(res.user_id);
                 }
-                Err(e) => {
+                Err(_e) => {
                     toaster.write().error(
                         "Please log in or create an account to continue.",
                         chrono::Duration::seconds(5),
@@ -48,7 +48,7 @@ pub fn Init(cx: Scope) -> Element {
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
-    let api_client = ApiClient::global();
+    let _api_client = ApiClient::global();
 
     let toaster = use_toaster(cx);
 

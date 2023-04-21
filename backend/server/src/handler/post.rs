@@ -1,7 +1,7 @@
 use axum::{async_trait, Json};
-use chrono::{Duration, Utc};
+use chrono::{Utc};
 use hyper::StatusCode;
-use tracing::info;
+
 use uchat_domain::{ids::*, Username};
 use uchat_endpoint::{
     app_url::{self, user_content},
@@ -13,10 +13,9 @@ use uchat_endpoint::{
         },
         types::{BookmarkAction, BoostAction, ImageKind, LikeStatus, PublicPost},
     },
-    user::endpoint::{CreateUser, CreateUserOk, Login, LoginOk},
     RequestFailed,
 };
-use uchat_query::{post::Post, session::Session, AsyncConnection};
+use uchat_query::{post::Post, AsyncConnection};
 
 use crate::{
     error::{ApiError, ApiResult},
@@ -130,7 +129,7 @@ impl AuthorizedApiRequest for NewPost {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         use uchat_endpoint::post::types::Content;
 
@@ -158,7 +157,7 @@ impl AuthorizedApiRequest for TrendingPosts {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         use uchat_query::post as query_post;
 
@@ -185,7 +184,7 @@ impl AuthorizedApiRequest for Bookmark {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         match self.action {
             BookmarkAction::Add => {
@@ -212,7 +211,7 @@ impl AuthorizedApiRequest for React {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         use uchat_endpoint::post::types::LikeStatus;
 
@@ -250,7 +249,7 @@ impl AuthorizedApiRequest for Boost {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         match self.action {
             BoostAction::Add => {
@@ -277,7 +276,7 @@ impl AuthorizedApiRequest for Vote {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         let cast =
             uchat_query::post::vote(&mut conn, session.user_id, self.post_id, self.choice_id)?;
@@ -293,7 +292,7 @@ impl AuthorizedApiRequest for HomePosts {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         use uchat_query::post as query_post;
 
@@ -320,7 +319,7 @@ impl AuthorizedApiRequest for LikedPosts {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         use uchat_query::post as query_post;
 
@@ -347,7 +346,7 @@ impl AuthorizedApiRequest for BookmarkedPosts {
         self,
         DbConnection(mut conn): DbConnection,
         session: UserSession,
-        state: AppState,
+        _state: AppState,
     ) -> ApiResult<Self::Response> {
         use uchat_query::post as query_post;
 

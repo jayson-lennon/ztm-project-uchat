@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use uchat_domain::{ids::*, Password, Username};
 use url::Url;
 
-use crate::{post::types::PublicPost, Endpoint, Update};
+use crate::{post::types::PublicPost, Update};
 
 use super::types::{FollowAction, PublicUserProfile};
 

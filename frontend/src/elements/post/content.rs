@@ -12,7 +12,7 @@ use uchat_endpoint::post::types::{
 };
 
 #[inline_props]
-pub fn Chat<'a>(cx: Scope<'a>, post_id: PostId, content: &'a EndpointChat) -> Element {
+pub fn Chat<'a>(cx: Scope<'a>, content: &'a EndpointChat) -> Element {
     let Headline = content.headline.as_ref().map(|headline| {
         rsx! {
             div {
@@ -31,7 +31,7 @@ pub fn Chat<'a>(cx: Scope<'a>, post_id: PostId, content: &'a EndpointChat) -> El
 }
 
 #[inline_props]
-pub fn Image<'a>(cx: Scope<'a>, post_id: PostId, content: &'a EndpointImage) -> Element {
+pub fn Image<'a>(cx: Scope<'a>, content: &'a EndpointImage) -> Element {
     let url = if let ImageKind::Url(url) = &content.kind {
         url
     } else {
@@ -151,8 +151,8 @@ pub fn Content<'a>(cx: Scope<'a>, post: &'a PublicPost) -> Element {
     cx.render(rsx! {
         div {
             match &post.content {
-                EndpointContent::Chat(content) => rsx! { Chat { post_id: post.id, content: content} },
-                EndpointContent::Image(content) => rsx! { Image { post_id: post.id, content: content} },
+                EndpointContent::Chat(content) => rsx! { Chat { content: content} },
+                EndpointContent::Image(content) => rsx! { Image { content: content} },
                 EndpointContent::Poll(content) => rsx! { Poll { post_id: post.id, content: content} },
             }
         }

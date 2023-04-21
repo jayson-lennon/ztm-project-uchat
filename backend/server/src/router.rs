@@ -7,7 +7,6 @@ use axum::{
 use hyper::{header::CONTENT_TYPE, Method};
 use tower::ServiceBuilder;
 use tower_http::{
-    compression::CompressionLayer,
     cors::CorsLayer,
     limit::RequestBodyLimitLayer,
     trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer},

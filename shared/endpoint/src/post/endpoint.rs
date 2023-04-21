@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uchat_domain::ids::{PollChoiceId, PostId};
 
-use crate::Endpoint;
+
 
 use super::types::{
     BookmarkAction, BoostAction, Content, LikeStatus, NewPostOptions, PublicPost, VoteCast,

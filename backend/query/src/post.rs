@@ -2,18 +2,18 @@ use chrono::DateTime;
 use chrono::Utc;
 use diesel::prelude::*;
 use diesel::PgConnection;
-use password_hash::PasswordHashString;
+
 use serde::Deserialize;
 use serde::Serialize;
 use uchat_domain::ids::PollChoiceId;
 use uchat_domain::ids::PostId;
 use uchat_domain::ids::UserId;
-use uchat_domain::Username;
+
 use uchat_endpoint::post::types::VoteCast;
 use uuid::Uuid;
 
 use crate::schema;
-use crate::{DieselError, QueryError};
+use crate::{DieselError};
 
 #[derive(Clone, Debug, DieselNewType, Serialize, Deserialize)]
 pub struct Content(pub serde_json::Value);
