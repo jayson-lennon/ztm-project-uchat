@@ -42,3 +42,63 @@ pub mod cli {
         Ok(Keys::from_encoded(private_key)?)
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    pub mod util {
+        use axum::{
+            response::{IntoResponse, Response},
+            Router,
+        };
+        use hyper::Request;
+        use serde::Serialize;
+        use tower::ServiceExt;
+        use uchat_crypto::sign::Keys;
+        use uchat_query::AsyncConnectionPool;
+
+        use crate::AppState;
+
+        pub async fn new_state() -> AppState {
+            let connection_url = dotenvy::var("TEST_DATABASE_URL")
+                .expect("TEST_DATABASE_URL must be set in order to run tests");
+            let mut rng = uchat_crypto::new_rng();
+            AppState {
+                db_pool: AsyncConnectionPool::new(connection_url).await.unwrap(),
+                signing_keys: Keys::generate(&mut rng).unwrap().1,
+                rng,
+            }
+        }
+
+        pub async fn new_router() -> Router {
+            let state = new_state().await;
+            crate::router::new_router(state)
+        }
+
+        pub async fn api_request_with_router<P>(router: Router, uri: &str, payload: P) -> Response
+        where
+            P: Serialize,
+        {
+            let payload = serde_json::to_string(&payload).unwrap();
+            router
+                .oneshot(
+                    Request::builder()
+                        .method("POST")
+                        .header("Content-Type", "application/json")
+                        .uri(uri)
+                        .body(payload.into())
+                        .unwrap(),
+                )
+                .await
+                .unwrap()
+                .into_response()
+        }
+
+        pub async fn api_request<P>(uri: &str, payload: P) -> Response
+        where
+            P: Serialize,
+        {
+            let router = new_router().await;
+            api_request_with_router(router, uri, payload).await
+        }
+    }
+}
