@@ -63,7 +63,7 @@ pub fn connect<S: AsRef<str>>(url: S) -> Result<PgConnection, ConnectionError> {
 }
 
 /// Usage:
-/// ```
+/// ```ignore
 /// let async_pool = new_async_pool("postgres://login@localhost/sample").await;
 /// let conn = &mut async_pool.get().await?;
 /// ```
