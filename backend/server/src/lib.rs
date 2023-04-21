@@ -45,6 +45,15 @@ pub mod cli {
 
 #[cfg(test)]
 pub mod tests {
+    use hyper::StatusCode;
+    use uchat_domain::{Password, Username};
+    use uchat_endpoint::{
+        user::endpoint::{CreateUser, CreateUserOk},
+        Endpoint,
+    };
+
+    pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
     pub mod util {
         use axum::{
             response::{IntoResponse, Response},
@@ -100,5 +109,46 @@ pub mod tests {
             let router = new_router().await;
             api_request_with_router(router, uri, payload).await
         }
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn create_user() -> Result<()> {
+        use rand::distributions::Alphanumeric;
+        use rand::{thread_rng, Rng};
+
+        let username: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(20)
+            .map(char::from)
+            .collect();
+        // user doesnt exist yet
+        {
+            let payload = CreateUser {
+                password: Password::new("password")?,
+                username: Username::new(&username)?,
+            };
+
+            let response = util::api_request(CreateUser::URL, payload).await;
+
+            assert_eq!(StatusCode::CREATED, response.status());
+
+            let response = hyper::body::to_bytes(response.into_body()).await?;
+            let response: CreateUserOk = serde_json::from_slice(&response)?;
+
+            assert_eq!(username, response.username.into_inner());
+        }
+
+        // try to add duplicate user
+        {
+            let payload = CreateUser {
+                password: Password::new("password")?,
+                username: Username::new(username)?,
+            };
+            let response = util::api_request(CreateUser::URL, payload).await;
+
+            assert_eq!(StatusCode::CONFLICT, response.status());
+        }
+
+        Ok(())
     }
 }
