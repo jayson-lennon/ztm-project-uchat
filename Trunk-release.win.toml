@@ -1,0 +1,12 @@
+[build]
+target = "frontend/index.html"
+dist = "target/dist"
+release = true
+
+[[hooks]]
+stage = "build"
+command = "sh"
+command_arguments = [
+    "-c",
+    "npx tailwindcss -i frontend/src/tailwind.css -o $TRUNK_STAGING_DIR\\tailwind.css -m -c frontend/tailwind.config.js",
+]
