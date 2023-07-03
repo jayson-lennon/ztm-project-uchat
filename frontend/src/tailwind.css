@@ -9,4 +9,8 @@
   .btn {
     @apply px-4 py-2 rounded font-semibold text-sm bg-slate-600 shadow-sm text-white;
   }
+
+  .input-field {
+    @apply w-full border-2 rounded border-slate-400;
+  }
 }
