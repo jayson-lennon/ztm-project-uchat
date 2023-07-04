@@ -2,11 +2,15 @@
 
 use dioxus::prelude::*;
 
-use crate::prelude::*;
+use crate::{
+    elements::{keyed_notification_box::KeyedNotifications, KeyedNotificationBox},
+    prelude::*,
+};
 
 pub struct PageState {
     username: UseState<String>,
     password: UseState<String>,
+    form_errors: KeyedNotifications,
 }
 
 impl PageState {
@@ -14,7 +18,14 @@ impl PageState {
         Self {
             username: use_state(cx, String::new).clone(),
             password: use_state(cx, String::new).clone(),
+            form_errors: KeyedNotifications::default(),
         }
+    }
+
+    pub fn can_submit(&self) -> bool {
+        !(self.form_errors.has_messages()
+            || self.username.current().is_empty()
+            || self.password.current().is_empty())
     }
 }
 
@@ -74,13 +85,25 @@ pub fn Register(cx: Scope) -> Element {
     let page_state = use_ref(cx, || page_state);
 
     let username_oninput = sync_handler!([page_state], move |ev: FormEvent| {
-        let username = uchat_domain::Username::new(&ev.value);
+        if let Err(e) = uchat_domain::Username::new(&ev.value) {
+            page_state.with_mut(|state| state.form_errors.set("bad-username", e.to_string()));
+        } else {
+            page_state.with_mut(|state| state.form_errors.remove("bad-username"));
+        }
         page_state.with_mut(|state| state.username.set(ev.value.clone()));
     });
 
     let password_oninput = sync_handler!([page_state], move |ev: FormEvent| {
+        if let Err(e) = uchat_domain::Password::new(&ev.value) {
+            page_state.with_mut(|state| state.form_errors.set("bad-password", e.to_string()));
+        } else {
+            page_state.with_mut(|state| state.form_errors.remove("bad-password"));
+        }
         page_state.with_mut(|state| state.password.set(ev.value.clone()));
     });
+
+    let submit_btn_style =
+        maybe_class!("btn-disabled", !page_state.with(|state| state.can_submit()));
 
     cx.render(rsx! {
         form {
@@ -98,9 +121,15 @@ pub fn Register(cx: Scope) -> Element {
                 oninput: password_oninput,
             },
 
+            KeyedNotificationBox {
+                legend: "Form Errors",
+                notifications: page_state.clone().with(|state| state.form_errors.clone()),
+            },
+
             button {
-                class: "btn",
+                class: "btn {submit_btn_style}",
                 r#type: "submit",
+                disabled: !page_state.with(|state| state.can_submit()),
                 "Signup"
             }
         }
