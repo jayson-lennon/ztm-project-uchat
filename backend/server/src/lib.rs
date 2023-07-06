@@ -1,6 +1,8 @@
 use axum::extract::FromRef;
 use uchat_query::{AsyncConnection, AsyncConnectionPool, QueryError};
 
+pub mod logging;
+
 #[derive(Clone, FromRef)]
 pub struct AppState {
     pub db_pool: AsyncConnectionPool,
@@ -15,6 +17,7 @@ impl AppState {
 }
 
 pub mod cli {
+    use color_eyre::{eyre::Context, Help};
     use rand_core::{CryptoRng, RngCore};
     use uchat_crypto::sign::{EncodedPrivateKey, Keys};
 
