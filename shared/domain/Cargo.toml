@@ -14,10 +14,10 @@ thiserror = "1"
 uuid = { version = "1.4.0", features = ["v4", "serde", "js"] }
 
 # backend
-diesel-derive-newtype = {version = "2.1.0", optional = true}
+diesel-derive-newtype = {version = "=2.0.0-rc.0", optional = true}
 
 [dependencies.diesel]
-version = "2.1.0"
+version = "=2.0.3"
 features = ["postgres", "uuid", "chrono", "serde_json", "postgres_backend", "i-implement-a-third-party-backend-and-opt-into-breaking-changes"]
 default-features = false
 optional = true 

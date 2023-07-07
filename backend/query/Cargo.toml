@@ -9,7 +9,7 @@ edition = "2021"
 bb8 = "0.8.0"
 bb8-diesel = { git = "https://github.com/overdrivenpotato/bb8-diesel.git" }
 chrono = { version = "0.4.23", features = ["serde"] }
-diesel-derive-newtype = "2.0.0-rc.0"
+diesel-derive-newtype = {version = "=2.0.0-rc.0", optional = true}
 diesel_migrations = { version = "2.0.0", features = ["postgres"] }
 password-hash = { version = "0.5.0", features = ["std"] }
 r2d2 = "0.8.10"
@@ -30,7 +30,7 @@ features = [
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
   "postgres_backend",
 ]
-version = "2.0.3"
+version = "=2.0.3"
 default-features = false
 
 [dev-dependencies]
