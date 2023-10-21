@@ -200,3 +200,57 @@ After creating a new migration, delete the testing database using:
 ```bash
 psql -d postgres -c 'DROP DATABASE uchat_test;'
 ```
+
+## `git tag`
+
+Over time, the `Cargo.lock` and `Cargo.toml` files will diverge from what is
+shown in the videos. This will cause lots of extraneous data to be displayed
+when trying to view the `git diff` output between your code and what is shown
+in the videos. To get useful `diff` output use this command:
+
+```sh
+git diff VIDEO_GIT_TAG ':(exclude)Cargo.lock' ':(exclude)*/Cargo.toml'`
+```
+
+and substitute VIDEO_GIT_TAG with the one shown in the video (use double quotes
+" " if you are on Windows). This will ignore these files in the diff output,
+allowing you to see the actual code changes between videos.
+
+## Updates / Compiler errors
+
+Throughout the videos for this project we use the `cargo add` command to add
+dependencies. This pulls in the most recent version of the dependency which
+will likely differ from the version that was pulled while recording the videos.
+APIs change over time, so some adjustments are necessary while creating this project.
+
+Here is a list of potential issues you may encounter, and how to update your
+code to fix them.
+
+### `nutype`
+
+```text
+error: Unknown validation rule `present`
+ --> shared/domain/src/post.rs:5:19
+  |
+5 | #[nutype(validate(present, max_len = 50))]
+  |                   ^^^^^^^
+```
+
+```text
+error[E0599]: no variant or associated item named `Missing` found for enum `UsernameError` in the current scope
+  --> shared/domain/src/user.rs:14:28
+   |
+7  | #[nutype(validate(not_empty, min_len = 3, max_len = 30))]
+   | --------------------------------------------------------- variant or associated item `Missing` not found for this enum
+...
+14 |             UsernameError::Missing => "User name cannot be empty.",
+   |                            ^^^^^^^ variant or associated item not found in `UsernameError`
+```
+
+The `nutype` crate now uses the `not_empty` rule instead of `present`. To fix
+this, two changes need to be made:
+
+1. Replace all `#[nutype(validate(present, ...))]` with
+   `#[nutype(validate(not_empty, ...))]`
+2. In all `impl` blocks where we create `fn formatted_error`, change
+   `StructError::Missing` to `StructError::Empty`.
