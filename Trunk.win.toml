@@ -8,5 +8,5 @@ stage = "build"
 command = "sh"
 command_arguments = [
   "-c",
-  "npx --yes tailwindcss -i frontend/src/tailwind.css -o $TRUNK_STAGING_DIR\\tailwind.css -m -c frontend/tailwind.config.js",
+  "npx --yes @tailwindcss/cli -i frontend/src/tailwind.css -o $TRUNK_STAGING_DIR\\tailwind.css -m -c frontend/tailwind.config.js",
 ]
